@@ -78,6 +78,9 @@ code {
   margin: 0;
   line-height: 1.5rem;
   color: #73d0ff;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: auto;
 }
 
 figure {
@@ -135,4 +138,18 @@ img {
 .reading-time {
   color: #d5ff80;
   font-size: 0.9em;
+}
+
+.flavour-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #8A9199CC;
+  font-size: medium;
+}
+
+.top-text {
+  white-space: nowrap;
+  overflow: visible;
+  padding-right: 1rem;
 }
