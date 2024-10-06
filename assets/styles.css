@@ -1,0 +1,136 @@
+:root {
+  --container-padding: 3rem;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  background-color: #171b24;
+  color: #cbccc6;
+  font-size: 1.2rem;
+  line-height: 1.8rem;
+}
+
+header {
+  text-align: left;
+  border-bottom: 1px solid #5c6773;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+h1 {
+  color: #ffad66;
+}
+
+h2 {
+  color: #ffdfb3;
+}
+
+hr {
+  margin: 2rem;
+}
+
+p {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  text-align: justify;
+}
+
+article {
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+
+a {
+  color: #f28779;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+a:hover {
+  background-color: #f28779;
+  color: #242936;
+}
+
+pre {
+  font-family: monospace;
+  padding: 2rem 3rem;
+  font-size: 1.3rem;
+  line-height: 1.6rem;
+  margin-left: calc(var(--container-padding) * -1);
+  margin-right: calc(var(--container-padding) * -1);
+  box-sizing: border-box;
+}
+
+blockquote {
+  font-style: italic;
+  text-align: left;
+  color: #d5ff80;
+  margin: 2rem;
+  padding-left: 2rem;
+  border-left: 2px solid #d5ff80;
+}
+
+code {
+  margin: 0;
+  line-height: 1.5rem;
+  color: #73d0ff;
+}
+
+figure {
+  margin: 1rem calc(var(--container-padding) * -1);
+}
+
+figcaption {
+  margin: 1rem 5rem;
+  text-align: center;
+  font-size: medium;
+  font-style: italic;
+  color: #d5ff80;
+}
+
+img {
+  width: 100%;
+}
+
+.container {
+  margin: 5% auto;
+  padding: var(--container-padding);
+  max-width: 1000px;
+  border: 1px solid #5c6773;
+  background-color: #1f2430;
+}
+
+.title-bar {
+  background-color: #171b24;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  margin-left: calc(var(--container-padding) * -1);
+  margin-right: calc(var(--container-padding) * -1);
+  margin-top: calc(var(--container-padding) * -1);
+  display: flex;
+  justify-content: space-between;
+}
+
+.navigation {
+  background-color: #171b24;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  margin-left: calc(var(--container-padding) * -1);
+  margin-right: calc(var(--container-padding) * -1);
+  margin-bottom: calc(var(--container-padding) * -1);
+  display: flex;
+  justify-content: space-between;
+}
+
+.date {
+  color: #73d0ff;
+  font-size: 0.9em;
+  margin-right: 10px;
+}
+
+.reading-time {
+  color: #d5ff80;
+  font-size: 0.9em;
+}

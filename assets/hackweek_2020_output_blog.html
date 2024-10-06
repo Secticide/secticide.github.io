@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"></script>
+    <script id='the_diff_string' type='text/plain'>
+diff --git a/Editor_Src_1.s b/Editor_Src_1.s
+index 4099d31..5af7ad8 100644
+--- a/Editor_Src_1.s
++++ b/Editor_Src_1.s
+@@ -1,243 +1,77 @@
+-Swap<dynamic_array<unsigned char {
+-$LN335:
++std::swap<dynamic_array<unsigned char {
++$LN261:
+ mov	QWORD PTR [rsp+16], rdx
+ mov	QWORD PTR [rsp+8], rcx
+-	push	rsi
+ push	rdi
+-	sub	rsp, 488
++	sub	rsp, 320
+ mov	rdi, rsp
+-	mov	ecx, 122
++	mov	ecx, 80
+ mov	eax, -858993460
+ rep stosd
+-	mov	rcx, QWORD PTR [rsp+512]
+-	lea	rax, QWORD PTR $T4[rsp]
+-	lea	rcx, OFFSET FLAT:?kMemDynamicArray@@3UMemLabelId@@A
+-	mov	rdi, rax
+-	mov	rsi, rcx
+-	mov	ecx, 12
+-	rep movsb
+-	mov	QWORD PTR temp$[rsp], 0
+-	lea	rdx, QWORD PTR $T4[rsp]
+-	lea	rcx, QWORD PTR $T6[rsp]
+-	call	?SetCurrentMemoryOwner@@YA?AUMemLabelId@@AEBU1@@Z
+-	lea	rcx, QWORD PTR $T5[rsp]
+-	mov	rdi, rcx
+-	mov	rsi, rax
+-	mov	ecx, 12
+-	rep movsb
+-	lea	rax, QWORD PTR temp$[rsp+8]
+-	lea	rcx, QWORD PTR $T5[rsp]
+-	mov	rdi, rax
+-	mov	rsi, rcx
+-	mov	ecx, 12
+-	rep movsb
+-	mov	QWORD PTR temp$[rsp+24], 0
+-	mov	QWORD PTR temp$[rsp+32], 1
+-	lea	rax, QWORD PTR temp$[rsp]
+-	mov	QWORD PTR this$[rsp], rax
+-	mov	rax, QWORD PTR this$[rsp]
+-	cmp	QWORD PTR a$[rsp], rax
+-	je	$LN9@Swap
+-	mov	rax, QWORD PTR a$[rsp]
+-	mov	rax, QWORD PTR [rax]
++	mov	rcx, QWORD PTR [rsp+336]
++	mov	rax, QWORD PTR _Left$[rsp]
++	mov	QWORD PTR $T4[rsp], rax
++	mov	rax, QWORD PTR $T4[rsp]
++	mov	QWORD PTR $T5[rsp], rax
++	mov	rdx, QWORD PTR $T5[rsp]
++	lea	rcx, QWORD PTR _Tmp$[rsp]
++	call	??0dynamic_array_data@dynamic_array_detail@@QEAA@$$QEAU01@@Z
++	npad	1
++	mov	rax, QWORD PTR _Right$[rsp]
++	mov	QWORD PTR $T6[rsp], rax
++	mov	rdx, QWORD PTR $T6[rsp]
++	mov	rcx, QWORD PTR _Left$[rsp]
++	call	??4?$dynamic_array@E$0A@@@QEAAAEAU0@$$QEAU0@@Z
++	lea	rax, QWORD PTR _Tmp$[rsp]
+ mov	QWORD PTR $T7[rsp], rax
+-	mov	rax, QWORD PTR a$[rsp]
+-	mov	rax, QWORD PTR [rax+24]
+-	mov	QWORD PTR $T8[rsp], rax
+-	mov	rax, QWORD PTR $T8[rsp]
+-	mov	rcx, QWORD PTR $T7[rsp]
+-	add	rcx, rax
+-	mov	rax, rcx
+-	mov	QWORD PTR tv128[rsp], rax
+-	mov	rax, QWORD PTR a$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T9[rsp], rax
+-	mov	rax, QWORD PTR $T9[rsp]
+-	mov	QWORD PTR tv94[rsp], rax
+-	mov	r8, QWORD PTR tv128[rsp]
+-	mov	rdx, QWORD PTR tv94[rsp]
+-	mov	rcx, QWORD PTR this$[rsp]
+-	call	?assign@?$dynamic_array@E$0A@@@QEAAXPEBE0@Z
+-$LN9@Swap:
+-	mov	rax, QWORD PTR a$[rsp]
+-	cmp	QWORD PTR b$[rsp], rax
+-	je	$LN118@Swap
+-	mov	rax, QWORD PTR b$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T10[rsp], rax
+-	mov	rax, QWORD PTR b$[rsp]
+-	mov	rax, QWORD PTR [rax+24]
+-	mov	QWORD PTR $T11[rsp], rax
+-	mov	rax, QWORD PTR $T11[rsp]
+-	mov	rcx, QWORD PTR $T10[rsp]
+-	add	rcx, rax
+-	mov	rax, rcx
+-	mov	QWORD PTR tv275[rsp], rax
+-	mov	rax, QWORD PTR b$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T12[rsp], rax
+-	mov	rax, QWORD PTR $T12[rsp]
+-	mov	QWORD PTR tv276[rsp], rax
+-	mov	r8, QWORD PTR tv275[rsp]
+-	mov	rdx, QWORD PTR tv276[rsp]
+-	mov	rcx, QWORD PTR a$[rsp]
+-	call	?assign@?$dynamic_array@E$0A@@@QEAAXPEBE0@Z
+-$LN118@Swap:
+-	lea	rax, QWORD PTR temp$[rsp]
+-	mov	QWORD PTR other$[rsp], rax
+-	mov	rax, QWORD PTR b$[rsp]
+-	cmp	QWORD PTR other$[rsp], rax
+-	je	$LN227@Swap
+-	mov	rax, QWORD PTR other$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T13[rsp], rax
+-	mov	rax, QWORD PTR other$[rsp]
+-	mov	rax, QWORD PTR [rax+24]
+-	mov	QWORD PTR $T14[rsp], rax
+-	mov	rax, QWORD PTR $T14[rsp]
+-	mov	rcx, QWORD PTR $T13[rsp]
+-	add	rcx, rax
+-	mov	rax, rcx
+-	mov	QWORD PTR tv407[rsp], rax
+-	mov	rax, QWORD PTR other$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T15[rsp], rax
+-	mov	rax, QWORD PTR $T15[rsp]
+-	mov	QWORD PTR tv408[rsp], rax
+-	mov	r8, QWORD PTR tv407[rsp]
+-	mov	rdx, QWORD PTR tv408[rsp]
+-	mov	rcx, QWORD PTR b$[rsp]
+-	call	?assign@?$dynamic_array@E$0A@@@QEAAXPEBE0@Z
++	mov	rdx, QWORD PTR $T7[rsp]
++	mov	rcx, QWORD PTR _Right$[rsp]
++	call	??4?$dynamic_array@E$0A@@@QEAAAEAU0@$$QEAU0@@Z
+ npad	1
+-$LN227@Swap:
+-	lea	rcx, QWORD PTR temp$[rsp]
++	lea	rcx, QWORD PTR _Tmp$[rsp]
+ call	??1?$dynamic_array@E$0A@@@QEAA@XZ
+ mov	rcx, rsp
+-	lea	rdx, OFFSET FLAT:??$Swap@U?$dynamic_array@E$0A@@@@@YAXAEAU?$dynamic_array@E$0A@@@0@Z$rtcFrameData
++	lea	rdx, OFFSET FLAT:??$swap@U?$dynamic_array@E$0A@@@$0A@@std@@YAXAEAU?$dynamic_array@E$0A@@@0@Z$rtcFrameData
+ call	_RTC_CheckStackVars
+-	add	rsp, 488
++	add	rsp, 320
+ pop	rdi
+-	pop	rsi
+ ret	0
+}
+-Swap<dynamic_array<`anonymous namespace'::EventHeader {
++std::swap<dynamic_array<`anonymous namespace'::EventHeader {
+ mov	QWORD PTR [rsp+16], rdx
+ mov	QWORD PTR [rsp+8], rcx
+-	push	rsi
+ push	rdi
+-	sub	rsp, 488
++	sub	rsp, 320
+ mov	rdi, rsp
+-	mov	ecx, 122
++	mov	ecx, 80
+ mov	eax, -858993460
+ rep stosd
+-	mov	rcx, QWORD PTR [rsp+512]
+-	lea	rax, QWORD PTR $T4[rsp]
+-	lea	rcx, OFFSET FLAT:?kMemDynamicArray@@3UMemLabelId@@A
+-	mov	rdi, rax
+-	mov	rsi, rcx
+-	mov	ecx, 12
+-	rep movsb
+-	mov	QWORD PTR temp$[rsp], 0
+-	lea	rdx, QWORD PTR $T4[rsp]
+-	lea	rcx, QWORD PTR $T6[rsp]
+-	call	?SetCurrentMemoryOwner@@YA?AUMemLabelId@@AEBU1@@Z
+-	lea	rcx, QWORD PTR $T5[rsp]
+-	mov	rdi, rcx
+-	mov	rsi, rax
+-	mov	ecx, 12
+-	rep movsb
+-	lea	rax, QWORD PTR temp$[rsp+8]
+-	lea	rcx, QWORD PTR $T5[rsp]
+-	mov	rdi, rax
+-	mov	rsi, rcx
+-	mov	ecx, 12
+-	rep movsb
+-	mov	QWORD PTR temp$[rsp+24], 0
+-	mov	QWORD PTR temp$[rsp+32], 1
+-	lea	rax, QWORD PTR temp$[rsp]
+-	mov	QWORD PTR this$[rsp], rax
+-	mov	rax, QWORD PTR this$[rsp]
+-	cmp	QWORD PTR a$[rsp], rax
+-	je	$LN9@Swap
+-	mov	rax, QWORD PTR a$[rsp]
+-	mov	rax, QWORD PTR [rax]
++	mov	rcx, QWORD PTR [rsp+336]
++	mov	rax, QWORD PTR _Left$[rsp]
++	mov	QWORD PTR $T4[rsp], rax
++	mov	rax, QWORD PTR $T4[rsp]
++	mov	QWORD PTR $T5[rsp], rax
++	mov	rdx, QWORD PTR $T5[rsp]
++	lea	rcx, QWORD PTR _Tmp$[rsp]
++	call	??0dynamic_array_data@dynamic_array_detail@@QEAA@$$QEAU01@@Z
++	npad	1
++	mov	rax, QWORD PTR _Right$[rsp]
++	mov	QWORD PTR $T6[rsp], rax
++	mov	rdx, QWORD PTR $T6[rsp]
++	mov	rcx, QWORD PTR _Left$[rsp]
++	call	??4?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@QEAAAEAU0@$$QEAU0@@Z
++	lea	rax, QWORD PTR _Tmp$[rsp]
+ mov	QWORD PTR $T7[rsp], rax
+-	mov	rax, QWORD PTR a$[rsp]
+-	mov	rax, QWORD PTR [rax+24]
+-	mov	QWORD PTR $T8[rsp], rax
+-	imul	rax, QWORD PTR $T8[rsp], 12
+-	mov	rcx, QWORD PTR $T7[rsp]
+-	add	rcx, rax
+-	mov	rax, rcx
+-	mov	QWORD PTR tv128[rsp], rax
+-	mov	rax, QWORD PTR a$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T9[rsp], rax
+-	mov	rax, QWORD PTR $T9[rsp]
+-	mov	QWORD PTR tv94[rsp], rax
+-	mov	r8, QWORD PTR tv128[rsp]
+-	mov	rdx, QWORD PTR tv94[rsp]
+-	mov	rcx, QWORD PTR this$[rsp]
+-	call	?assign@?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@QEAAXPEBUEventHeader@?A0xf937e076@@0@Z
+-$LN9@Swap:
+-	mov	rax, QWORD PTR a$[rsp]
+-	cmp	QWORD PTR b$[rsp], rax
+-	je	$LN118@Swap
+-	mov	rax, QWORD PTR b$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T10[rsp], rax
+-	mov	rax, QWORD PTR b$[rsp]
+-	mov	rax, QWORD PTR [rax+24]
+-	mov	QWORD PTR $T11[rsp], rax
+-	imul	rax, QWORD PTR $T11[rsp], 12
+-	mov	rcx, QWORD PTR $T10[rsp]
+-	add	rcx, rax
+-	mov	rax, rcx
+-	mov	QWORD PTR tv279[rsp], rax
+-	mov	rax, QWORD PTR b$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T12[rsp], rax
+-	mov	rax, QWORD PTR $T12[rsp]
+-	mov	QWORD PTR tv216[rsp], rax
+-	mov	r8, QWORD PTR tv279[rsp]
+-	mov	rdx, QWORD PTR tv216[rsp]
+-	mov	rcx, QWORD PTR a$[rsp]
+-	call	?assign@?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@QEAAXPEBUEventHeader@?A0xf937e076@@0@Z
+-$LN118@Swap:
+-	lea	rax, QWORD PTR temp$[rsp]
+-	mov	QWORD PTR other$[rsp], rax
+-	mov	rax, QWORD PTR b$[rsp]
+-	cmp	QWORD PTR other$[rsp], rax
+-	je	$LN227@Swap
+-	mov	rax, QWORD PTR other$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T13[rsp], rax
+-	mov	rax, QWORD PTR other$[rsp]
+-	mov	rax, QWORD PTR [rax+24]
+-	mov	QWORD PTR $T14[rsp], rax
+-	imul	rax, QWORD PTR $T14[rsp], 12
+-	mov	rcx, QWORD PTR $T13[rsp]
+-	add	rcx, rax
+-	mov	rax, rcx
+-	mov	QWORD PTR tv412[rsp], rax
+-	mov	rax, QWORD PTR other$[rsp]
+-	mov	rax, QWORD PTR [rax]
+-	mov	QWORD PTR $T15[rsp], rax
+-	mov	rax, QWORD PTR $T15[rsp]
+-	mov	QWORD PTR tv317[rsp], rax
+-	mov	r8, QWORD PTR tv412[rsp]
+-	mov	rdx, QWORD PTR tv317[rsp]
+-	mov	rcx, QWORD PTR b$[rsp]
+-	call	?assign@?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@QEAAXPEBUEventHeader@?A0xf937e076@@0@Z
++	mov	rdx, QWORD PTR $T7[rsp]
++	mov	rcx, QWORD PTR _Right$[rsp]
++	call	??4?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@QEAAAEAU0@$$QEAU0@@Z
+ npad	1
+-$LN227@Swap:
+-	lea	rcx, QWORD PTR temp$[rsp]
++	lea	rcx, QWORD PTR _Tmp$[rsp]
+ call	??1?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@QEAA@XZ
+ mov	rcx, rsp
+-	lea	rdx, OFFSET FLAT:??$Swap@U?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@@@YAXAEAU?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@0@Z$rtcFrameData
++	lea	rdx, OFFSET FLAT:??$swap@U?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@$0A@@std@@YAXAEAU?$dynamic_array@UEventHeader@?A0xf937e076@@$0A@@@0@Z$rtcFrameData
+ call	_RTC_CheckStackVars
+-	add	rsp, 488
++	add	rsp, 320
+ pop	rdi
+-	pop	rsi
+ ret	0
+}
+\ No newline at end of file
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const targetElement = document.getElementById('diff');
+        const configuration = { drawFileList: true, matching: 'lines', outputFormat: 'side-by-side' };
+        const extracted_diff_str = document.getElementById('the_diff_string').textContent;
+        const diff2htmlUi = new Diff2HtmlUI(targetElement, extracted_diff_str, configuration);
+        diff2htmlUi.draw();
+    });
+</script>
+</head>
+
+<body>
+    <div id="diff">
+    </div>
+</body>
+</html>
