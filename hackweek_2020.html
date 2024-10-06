@@ -1,45 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Jak Boulton | Hackweek 2020: Assembly Diff Tool</title>
-        <link rel="stylesheet" href="assets/styles.css">
-    </head>
-    <body class="terminal">
-        <div class="container">
-            <div class="title-bar">
-                <span><a href="index.html">&#10531; Home</a></span>
-                <span>&#10539;</span>
-            </div>
-            <header>
-                <h1>Hackweek 2020: Assembly Diff Tool</h1>
-                <time datetime="2020-07-02" class="date">2nd July 2020</time>
-                <span class="reading-time">7 minute read</span>
-           </header>
-           <main>
-                <p>The annual Hackweek event was held last week at Unity. This is an employee only event organised by Unity as a source of innovation, collaboration and idea generation. In the months leading up to the event, employees are encouraged to share their ideas and invite others to join them in a week of research and development. Throughout the week we hack prototypes together and evaluate their potential for future innovation.</p>
-<hr />
-<h2>The Project</h2>
-<p>This year the idea formed during a series of conversations between a number of members of the Sustained Engineering team who are focused on ensuring the quality and stability of Unity. We found a gap in our workflow and wanted a tool that could assist in the pull request review process. The tool would need to help us evaluate the effect a given pull request would have on the performance of the areas of code it touched. It would also have to be small enough in scope to be prototyped within a week. The tool and project we decided to embark on prototyping was an <strong>Assembly Diff Tool</strong>.</p>
-<blockquote>
-<p>Does this pull request improve performance, or hinder it?</p>
-</blockquote>
-<p>To start the week, we discussed our goals for the project and concluded that the best course of action would be to develop a command line tool. It could then be integrated wherever it was required, be it on a build machine or remote CI solution - a CLI tool would give us the most flexibility. CLI tools also have the advantage of being self contained, allowing for fast iteration times and the ability to experiment with new technologies. We decided to seize that opportunity for experimentation and write the tool in Rust!</p>
-<p>The following is an overview of how we envisioned the tool would work:</p>
-<ol>
-<li>Checkout <em>before</em> changeset</li>
-<li>Compile project, using compiler flags to generate assembly output</li>
-<li>Checkout <em>after</em> changeset</li>
-<li>Recompile project</li>
-<li>Diff the resulting assembly files</li>
-<li>Generate visual diff presentation</li>
-</ol>
-<hr />
-<h2>Setup</h2>
-<p>The Rust package directory crates.io contains a great deal of libraries we could use for parsing command line arguments. We were able to integrate and evaluate a number of packages very quickly and the consistent documentation generation allowed us to look past the set dressing and get straight to the information we desired.</p>
-<p>We settled on using <a href="https://github.com/clap-rs/clap" target="_blank" rel="noopener noreferrer">clap</a> as our command line argument parser. It offers a variety of patterns for defining the arguments your tool expects (a complete listing can be found on the <a href="https://docs.rs/clap/2.33.1/clap/" target="_blank" rel="noopener noreferrer">clap documentation website</a>). We chose to define our arguments using a struct tagged by the <code>#[derive(Clap)]</code> attribute. Attributes in Rust are essentially procedural macros and this one generates code based on the fields defined in the struct.</p>
-<pre style="background-color:#fdf6e3;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jak Boulton | Hackweek 2020: Assembly Diff Tool</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body class="terminal">
+    <div class="container">
+        <div class="title-bar">
+            <span><a href="index.html">&#10531; Home</a></span>
+            <span>&#10539;</span>
+        </div>
+        <header>
+            <h1>Hackweek 2020: Assembly Diff Tool</h1>
+            <time datetime="2020-07-02" class="date">2nd July 2020</time>
+            <span class="reading-time">7 minute read</span>
+        </header>
+        <main>
+            <p>The annual Hackweek event was held last week at Unity. This is an employee only event organised by Unity
+                as a source of innovation, collaboration and idea generation. In the months leading up to the event,
+                employees are encouraged to share their ideas and invite others to join them in a week of research and
+                development. Throughout the week we hack prototypes together and evaluate their potential for future
+                innovation.</p>
+            <hr />
+            <h2>The Project</h2>
+            <p>This year the idea formed during a series of conversations between a number of members of the Sustained
+                Engineering team who are focused on ensuring the quality and stability of Unity. We found a gap in our
+                workflow and wanted a tool that could assist in the pull request review process. The tool would need to
+                help us evaluate the effect a given pull request would have on the performance of the areas of code it
+                touched. It would also have to be small enough in scope to be prototyped within a week. The tool and
+                project we decided to embark on prototyping was an <strong>Assembly Diff Tool</strong>.</p>
+            <blockquote>
+                <p>Does this pull request improve performance, or hinder it?</p>
+            </blockquote>
+            <p>To start the week, we discussed our goals for the project and concluded that the best course of action
+                would be to develop a command line tool. It could then be integrated wherever it was required, be it on
+                a build machine or remote CI solution - a CLI tool would give us the most flexibility. CLI tools also
+                have the advantage of being self contained, allowing for fast iteration times and the ability to
+                experiment with new technologies. We decided to seize that opportunity for experimentation and write the
+                tool in Rust!</p>
+            <p>The following is an overview of how we envisioned the tool would work:</p>
+            <ol>
+                <li>Checkout <em>before</em> changeset</li>
+                <li>Compile project, using compiler flags to generate assembly output</li>
+                <li>Checkout <em>after</em> changeset</li>
+                <li>Recompile project</li>
+                <li>Diff the resulting assembly files</li>
+                <li>Generate visual diff presentation</li>
+            </ol>
+            <hr />
+            <h2>Setup</h2>
+            <p>The Rust package directory crates.io contains a great deal of libraries we could use for parsing command
+                line arguments. We were able to integrate and evaluate a number of packages very quickly and the
+                consistent documentation generation allowed us to look past the set dressing and get straight to the
+                information we desired.</p>
+            <p>We settled on using <a href="https://github.com/clap-rs/clap" target="_blank"
+                    rel="noopener noreferrer">clap</a> as our command line argument parser. It offers a variety of
+                patterns for defining the arguments your tool expects (a complete listing can be found on the <a
+                    href="https://docs.rs/clap/2.33.1/clap/" target="_blank" rel="noopener noreferrer">clap
+                    documentation website</a>). We chose to define our arguments using a struct tagged by the
+                <code>#[derive(Clap)]</code> attribute. Attributes in Rust are essentially procedural macros and this
+                one generates code based on the fields defined in the struct.</p>
+            <pre style="background-color:#fdf6e3;">
 <span style="color:#268bd2;">struct </span><span style="color:#b58900;">Args </span><span style="color:#657b83;">{
 </span><span style="color:#657b83;">    </span><span style="color:#93a1a1;">/// Project Directory
 </span><span style="color:#657b83;">    </span><span style="color:#268bd2;">project_directory</span><span style="color:#657b83;">: std::path::PathBuf,
@@ -57,10 +82,17 @@
 </span><span style="color:#657b83;">    </span><span style="color:#268bd2;">verbose</span><span style="color:#657b83;">: </span><span style="color:#268bd2;">bool</span><span style="color:#657b83;">,
 </span><span style="color:#657b83;">}
 </span></pre>
-<p>The above is the complete argument struct at the end of the week. It is especially convenient that clap automatically parses a number of types interchangeably. The derive attribute above generates a <em>parse</em> function that collects the arguments passed to the program and returns them in the form of an instance of the struct. It even generates a <code>-help</code> argument output from documentation comments!</p>
-<p>With the parsed arguments in hand, we need to run a number of commands to complete the steps outlined above. This is very simple with Rust due to the extensive standard library, we used <a href="https://doc.rust-lang.org/beta/std/process/struct.Command.html" target="_blank" rel="noopener noreferrer">std::process::Command</a>.</p>
-<p>Here is a look at how we used the API:</p>
-<pre style="background-color:#fdf6e3;">
+            <p>The above is the complete argument struct at the end of the week. It is especially convenient that clap
+                automatically parses a number of types interchangeably. The derive attribute above generates a
+                <em>parse</em> function that collects the arguments passed to the program and returns them in the form
+                of an instance of the struct. It even generates a <code>-help</code> argument output from documentation
+                comments!</p>
+            <p>With the parsed arguments in hand, we need to run a number of commands to complete the steps outlined
+                above. This is very simple with Rust due to the extensive standard library, we used <a
+                    href="https://doc.rust-lang.org/beta/std/process/struct.Command.html" target="_blank"
+                    rel="noopener noreferrer">std::process::Command</a>.</p>
+            <p>Here is a look at how we used the API:</p>
+            <pre style="background-color:#fdf6e3;">
 <span style="color:#586e75;">pub </span><span style="color:#268bd2;">fn </span><span style="color:#b58900;">diff_directories</span><span style="color:#657b83;">(
 </span><span style="color:#657b83;">    </span><span style="color:#268bd2;">directory</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
 </span><span style="color:#657b83;">    </span><span style="color:#268bd2;">from_dir</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
@@ -74,53 +106,96 @@
 </span><span style="color:#657b83;">        .</span><span style="color:#859900;">output</span><span style="color:#657b83;">()
 </span><span style="color:#657b83;">}
 </span></pre>
-<p>Using code similar to the above, we were able to run the various commands required to get the basic process in place, these were: git fetch/checkout, running the compiler (a custom build system in this case) and git diff (displayed above). It was helpful that <a href="https://git-scm.com/docs/git-diff" target="_blank" rel="noopener noreferrer">git diff</a> provides a argument set that allows for directory diffing; we didn't like the idea of individually diffing each pair of output assembly files.</p>
-<hr />
-<h2>Processing Assembly</h2>
-<p>We decided to use the temporary directory (<code>std::env::temp_dir()</code>) path and the original changeset hash to create an output directory for the compiled assembly files from each of the builds. Our structure was as follows:</p>
-<p><code>&lt;temp_dir&gt;\&lt;original_sha_1&gt;\&lt;before_or_after&gt;\&lt;asm_files&gt;</code></p>
-<p>Where a complete path (on Windows) could look like this:</p>
-<p><code>C:\Users\&lt;Username&gt;\AppData\Local\Temp\&lt;SHA-1&gt;\before</code></p>
-<p>Once we had the assembly in the right place, we used the <code>diff_directories</code> function to generate the diff. This is when we noticed a few problems. Firstly, the diff output was very noisy, especially when we tested on the whole Unity codebase. A simple change in one area of the engine would cause a mass of assembly line modifications, most of which we were not interested in. Secondly, assembly is large; a build of the Unity code base generated 5.37 gigabytes of assembly data. These issues combined resulted in a very large output diff consisting largely of superfluous modifications.</p>
-<p>We needed solutions for both of these problems for the tool to be useful at all. Deliberations and analysis of both the assembly and the diff led us to our solution; post process everything. We first post processed the diff since we noticed many lines had changed due to constant offset changes or data segment identifier changes. We went for the quick and naive approach of comparing each line to it's previous and discarding the lines from the diff if they were deemed similar <em>enough.</em></p>
-<pre style="background-color:#fdf6e3;">
+            <p>Using code similar to the above, we were able to run the various commands required to get the basic
+                process in place, these were: git fetch/checkout, running the compiler (a custom build system in this
+                case) and git diff (displayed above). It was helpful that <a href="https://git-scm.com/docs/git-diff"
+                    target="_blank" rel="noopener noreferrer">git diff</a> provides a argument set that allows for
+                directory diffing; we didn't like the idea of individually diffing each pair of output assembly files.
+            </p>
+            <hr />
+            <h2>Processing Assembly</h2>
+            <p>We decided to use the temporary directory (<code>std::env::temp_dir()</code>) path and the original
+                changeset hash to create an output directory for the compiled assembly files from each of the builds.
+                Our structure was as follows:</p>
+            <p><code>&lt;temp_dir&gt;\&lt;original_sha_1&gt;\&lt;before_or_after&gt;\&lt;asm_files&gt;</code></p>
+            <p>Where a complete path (on Windows) could look like this:</p>
+            <p><code>C:\Users\&lt;Username&gt;\AppData\Local\Temp\&lt;SHA-1&gt;\before</code></p>
+            <p>Once we had the assembly in the right place, we used the <code>diff_directories</code> function to
+                generate the diff. This is when we noticed a few problems. Firstly, the diff output was very noisy,
+                especially when we tested on the whole Unity codebase. A simple change in one area of the engine would
+                cause a mass of assembly line modifications, most of which we were not interested in. Secondly, assembly
+                is large; a build of the Unity code base generated 5.37 gigabytes of assembly data. These issues
+                combined resulted in a very large output diff consisting largely of superfluous modifications.</p>
+            <p>We needed solutions for both of these problems for the tool to be useful at all. Deliberations and
+                analysis of both the assembly and the diff led us to our solution; post process everything. We first
+                post processed the diff since we noticed many lines had changed due to constant offset changes or data
+                segment identifier changes. We went for the quick and naive approach of comparing each line to it's
+                previous and discarding the lines from the diff if they were deemed similar <em>enough.</em></p>
+            <pre style="background-color:#fdf6e3;">
 <span style="color:#657b83;">- mov rax, QWORD PTR $T11\[rsp]
 </span><span style="color:#657b83;">+ mov rax, QWORD PTR $T10\[rsp]
 </span></pre>
-<p>This reduced our diff by a decent amount, but it still wasn't small enough to create a usable output. Post processing the gigabytes of assembly data was the next step. Analysis of the assembly files revealed that there was alot that we could discard; we only wanted to diff instructions, not the surrounding data. We could therefore remove all lines outside of <em>TEXT</em> segments. Further processing / prettifying could be performed on the segments that remained to further reduce the size of the output.</p>
-<p>The following is a non-exhaustive list of the post processes performed:</p>
-<ul>
-<li>Discard empty lines,</li>
-<li>Discard comments (lines starting with a semi-colon, or sections of lines after the semi-colon),</li>
-<li>Discard all lines outside a <em>SEGMENT</em> block,</li>
-<li>Discard all blocks that are not <em>TEXT</em> blocks,</li>
-<li>Prettify function names.</li>
-</ul>
-<p>This looks like very aggressive post-processing and eager discarding of contents, I imagine in the future this would be configurable; there are cases where keeping various sections of the assembly files would be desirable dependent on use case and result desired. However, this worked for us and reduced the size of the assembly data generated from the previously mentioned 5.37 down to 1.4 gigabytes - I call that a success!</p>
-<hr />
-<h2>Presentation</h2>
-<p>Our tool was now able to checkout two provided changesets, execute build scripts to generate assembly files and build a diff from the changes between the two sets of assembly files. The final step was to present the diff in a readable way. Ideally it would also be quickly searchable and provide a collection of other means to inspect the contained information, but we wanted a solution that we could build within a week.</p>
-<p>We decided to go for the simple yet effective route of building a HTML file from a template, we used the <a href="https://diff2html.xyz/" target="_blank" rel="noopener noreferrer">diff2html</a> library to render the content. Initial attempts proved unfruitful due to the usage of an unmaintained and largely undocumented Rust crate version of diff2html. We tried to rely on the documentation provided by the javascript version of the library but ended up dropping the Rust version entirely and instead wrote a HTML template that we could inject the diff content into and leave the javascript library to do the rendering of the page.</p>
-<p>There were additional hurdles along the road however, it seems that diff2html (or browsers) can't handle large amounts of diff data, we tried feeding it with 186 megabytes of string data and it wasn't exactly happy with it. We would definitely need a more scalable solution if we were to develop this tool further and use it in a production environment.</p>
-<hr />
-<h2>Future</h2>
-<p>Now that Hackweek has concluded, many teams hope to continue working on their projects. In the past this has led to innovations in either the product or our workflows at Unity. Myself and the team are hoping to continue work on this (where we can find the time) and see what it can grow into, maybe I'll write an update here in the future detailing it's evolution or demise!</p>
-<p>Overall, Hackweek this year was a great experience and I thoroughly enjoyed it!</p>
-<p>Take a look at a snippet from one of the HTML files generated by the tool: <a href="assets/hackweek_2020_output_blog.html">Editor_Src_1.html</a></p>
+            <p>This reduced our diff by a decent amount, but it still wasn't small enough to create a usable output.
+                Post processing the gigabytes of assembly data was the next step. Analysis of the assembly files
+                revealed that there was alot that we could discard; we only wanted to diff instructions, not the
+                surrounding data. We could therefore remove all lines outside of <em>TEXT</em> segments. Further
+                processing / prettifying could be performed on the segments that remained to further reduce the size of
+                the output.</p>
+            <p>The following is a non-exhaustive list of the post processes performed:</p>
+            <ul>
+                <li>Discard empty lines,</li>
+                <li>Discard comments (lines starting with a semi-colon, or sections of lines after the semi-colon),</li>
+                <li>Discard all lines outside a <em>SEGMENT</em> block,</li>
+                <li>Discard all blocks that are not <em>TEXT</em> blocks,</li>
+                <li>Prettify function names.</li>
+            </ul>
+            <p>This looks like very aggressive post-processing and eager discarding of contents, I imagine in the future
+                this would be configurable; there are cases where keeping various sections of the assembly files would
+                be desirable dependent on use case and result desired. However, this worked for us and reduced the size
+                of the assembly data generated from the previously mentioned 5.37 down to 1.4 gigabytes - I call that a
+                success!</p>
+            <hr />
+            <h2>Presentation</h2>
+            <p>Our tool was now able to checkout two provided changesets, execute build scripts to generate assembly
+                files and build a diff from the changes between the two sets of assembly files. The final step was to
+                present the diff in a readable way. Ideally it would also be quickly searchable and provide a collection
+                of other means to inspect the contained information, but we wanted a solution that we could build within
+                a week.</p>
+            <p>We decided to go for the simple yet effective route of building a HTML file from a template, we used the
+                <a href="https://diff2html.xyz/" target="_blank" rel="noopener noreferrer">diff2html</a> library to
+                render the content. Initial attempts proved unfruitful due to the usage of an unmaintained and largely
+                undocumented Rust crate version of diff2html. We tried to rely on the documentation provided by the
+                javascript version of the library but ended up dropping the Rust version entirely and instead wrote a
+                HTML template that we could inject the diff content into and leave the javascript library to do the
+                rendering of the page.</p>
+            <p>There were additional hurdles along the road however, it seems that diff2html (or browsers) can't handle
+                large amounts of diff data, we tried feeding it with 186 megabytes of string data and it wasn't exactly
+                happy with it. We would definitely need a more scalable solution if we were to develop this tool further
+                and use it in a production environment.</p>
+            <hr />
+            <h2>Future</h2>
+            <p>Now that Hackweek has concluded, many teams hope to continue working on their projects. In the past this
+                has led to innovations in either the product or our workflows at Unity. Myself and the team are hoping
+                to continue work on this (where we can find the time) and see what it can grow into, maybe I'll write an
+                update here in the future detailing it's evolution or demise!</p>
+            <p>Overall, Hackweek this year was a great experience and I thoroughly enjoyed it!</p>
+            <p>Take a look at a snippet from one of the HTML files generated by the tool: <a
+                    href="assets/hackweek_2020_output_blog.html">Editor_Src_1.html</a></p>
 
-                <div class="navigation">
-    <span class="top-text">
-        <a href="#top">&#10532; Back To Top</a>
-    </span>
-    <span class="flavour-text">
-        Gdt Sun, 6 Oct 2024 23:02:10 +0100&nbsp;&nbsp;&nbsp;&nbsp;
-        Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
-        UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
-        LF&nbsp;&nbsp;&nbsp;&nbsp;
-        HTML&nbsp;&nbsp;&nbsp;&nbsp;&#10064;
-    </span>
-</div>
-           </main>
-       </div>
-    </body>
+            <div class="navigation">
+                <span class="top-text">
+                    <a href="#top">&#10532; Back To Top</a>
+                </span>
+                <span class="flavour-text">
+                    Gdt Mon, 7 Oct 2024 00:02:41 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+                    Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
+                    UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
+                    LF&nbsp;&nbsp;&nbsp;&nbsp;
+                    HTML&nbsp;&nbsp;&nbsp;&nbsp;&#10064;
+                </span>
+            </div>
+        </main>
+    </div>
+</body>
+
 </html>
