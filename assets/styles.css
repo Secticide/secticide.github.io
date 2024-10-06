@@ -60,7 +60,9 @@ pre {
   line-height: 1.6rem;
   margin-left: calc(var(--container-padding) * -1);
   margin-right: calc(var(--container-padding) * -1);
-  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: auto;
 }
 
 blockquote {
