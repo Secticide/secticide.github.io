@@ -153,3 +153,7 @@ img {
   overflow: visible;
   padding-right: 1rem;
 }
+
+.window-icon {
+  width: 1rem;
+}
