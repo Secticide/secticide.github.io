@@ -115,6 +115,7 @@ img {
   margin-right: calc(var(--container-padding) * -1);
   margin-top: calc(var(--container-padding) * -1);
   display: flex;
+  min-height: 30px;
   justify-content: space-between;
 }
 
@@ -126,6 +127,7 @@ img {
   margin-right: calc(var(--container-padding) * -1);
   margin-bottom: calc(var(--container-padding) * -1);
   display: flex;
+  min-height: 30px;
   justify-content: space-between;
 }
 
@@ -144,7 +146,7 @@ img {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #8A9199CC;
+  color: #63676ccc;
   font-size: medium;
 }
 
