@@ -19,7 +19,7 @@
                 <span class="reading-time">8 minute read</span>
            </header>
            <main>
-                <p>Why does the Futex exist? A number of years ago I was pondering this very question - along with why developers looking for a fast, low-latency lock often reach for the primitive. Unfortunately for this past version of myself; resources on the topic and details of the implementation were scarce. These details can certainly be found, but I'm yet to find a single resource that covers most of what you need to know in a single place. If - like that previous version of me - you are looking for details on what a Futex is and how it is implemented; you have come to the right place!</p>
+                <p>Why does the Futex exist? A number of years ago I was pondering this very question - along with why developers looking for a fast, low-latency lock often reach for the primitive. Unfortunately for this past version of myself; resources on the topic and details of the implementation were scarce. These details can certainly be found, but I'm yet to find a single resource that covers most of what you need to know in a single place. If, like my younger self, you are looking for details on what a Futex is and how it is implemented; you have come to the right place!</p>
 <hr />
 <h2>What is a Futex?</h2>
 <p>Let us begin by quoting a snippet from the <a href="https://en.wikipedia.org/wiki/Futex" target="_blank" rel="noopener noreferrer">Futex Wikipedia page</a>:</p>
@@ -73,8 +73,8 @@
 </span><span style="color:#657b83;">    }
 </span><span style="color:#657b83;">};
 </span></pre>
-<p>This implementation is <em>technically</em> already complete, assuming there is no misuse (like recursively calling lock or calling release when the lock isn't held). This is also incredibly fast when used in low contention scenarios due locking and unlocking requiring a single atomic operation.</p>
-<p>The problem is that all threads waiting for the lock will spin-loop until the lock is available - not good. The other tool we need is a way to sleep the thread while it waits for the lock, and wake it up when the lock is available.</p>
+<p>This implementation is <em>technically</em> already complete, assuming there is no misuse (like recursively calling lock or calling release when the lock isn't held). This is also incredibly fast when used in low contention scenarios due to locking and unlocking requiring a single atomic operation.</p>
+<p>The problem is that all threads waiting for the lock will spin-loop until the lock is available - not good. We need a means to sleep the thread while it waits for the lock, and to then reawaken it when the lock is available.</p>
 <h2>Atomic Wait &amp; Notify</h2>
 <p>One option would be to use the operating system primitives listed above to sleep the threads; but we can do better! All desktop operating systems also provide a low-cost primitive for sleeping and waking threads:</p>
 <ul>
@@ -83,10 +83,10 @@
 <li>Mac: <a href="https://developer.apple.com/documentation/os/os_sync_wait_on_address" target="_blank" rel="noopener noreferrer">os_sync_wait_on_address</a> &amp; <a href="https://developer.apple.com/documentation/os/os_sync_wake_by_address_any" target="_blank" rel="noopener noreferrer">os_sync_wake_by_address</a></li>
 </ul>
 <p>Interestingly, this has been a problem area on Mac for some time due to syscalls being a violation of Apple's store guidelines. The Mac APIs linked above were introduced with XCode 15.4, released in May 2024.</p>
-<p>The title of this section is &quot;Atomic Wait &amp; Notify&quot; because in C++20, these low cost sleep / wake primitives were added to the standard as building blocks intended for use with primitives like the Futex. Wait on address maps to atomic wait and wake by address maps to atomic notify. The APIs being referenced can be found on <em>cppreference</em>:</p>
+<p>The title of this section is &quot;Atomic Wait &amp; Notify&quot; because in C++20, these low cost sleep / wake primitives were added to the standard as building blocks intended for use with primitives like the Futex. The APIs being referenced can be found on <em>cppreference</em>:</p>
 <ul>
-<li><a href="https://en.cppreference.com/w/cpp/atomic/atomic_wait.html" target="_blank" rel="noopener noreferrer">std::atomic_wait</a></li>
-<li><a href="https://en.cppreference.com/w/cpp/atomic/atomic_notify_one.html" target="_blank" rel="noopener noreferrer">std::atomic_notify</a></li>
+<li><em>Wait on address</em> maps to <a href="https://en.cppreference.com/w/cpp/atomic/atomic_wait.html" target="_blank" rel="noopener noreferrer">std::atomic_wait</a></li>
+<li><em>Wake by address</em> maps to <a href="https://en.cppreference.com/w/cpp/atomic/atomic_notify_one.html" target="_blank" rel="noopener noreferrer">std::atomic_notify</a></li>
 </ul>
 <p>You may have noticed that the dates don't quite match up. These APIs were introduced in C++20, but Apple only added <em>usable</em> support for them in 2024. This does mean that another primitive was used to approximate the behaviour on Mac, meaning it isn't possible to write a Futex with the lowest possible latency on Mac if we're using only the C++ standard library. We will also have to wait for a version of MacOS that supports these APIs to reach relative ubiquity before releasing software that uses them on Mac - luckily Apple are rather pushy with OS updates.</p>
 <h2>Putting it all together</h2>
@@ -155,7 +155,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Sun, 20 Jul 2025 01:49:17 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Sun, 20 Jul 2025 02:07:03 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
