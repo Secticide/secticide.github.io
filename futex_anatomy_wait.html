@@ -19,7 +19,7 @@
                 <span class="reading-time">8 minute read</span>
            </header>
            <main>
-                <p>Once upon a time I was investigating the reason for the existance of the Futex and why developers looking for a fast, low latency lock often reach for this primitive. Unfortunately for this past version of myself; resources on the topic and details of the implementation were scarce. These details can certinly be found, but I'm yet to find a single resource that covers most of what you need to know in a single place. If - like that previous version of me - you are looking for details on what a Futex is and how it is implemented; you have come to the right place!</p>
+                <p>Why does the Futex exist? A number of years ago I was pondering this very question - along with why developers looking for a fast, low latency lock often reach for the primitive. Unfortunately for this past version of myself; resources on the topic and details of the implementation were scarce. These details can certainly be found, but I'm yet to find a single resource that covers most of what you need to know in a single place. If - like that previous version of me - you are looking for details on what a Futex is and how it is implemented; you have come to the right place!</p>
 <hr />
 <h2>What is a Futex?</h2>
 <p>Let us begin by quoting a snippet from the <a href="https://en.wikipedia.org/wiki/Futex" target="_blank" rel="noopener noreferrer">Futex Wikipedia page</a>:</p>
@@ -29,7 +29,7 @@
 <p>While this snippet is somewhat misleading, it does give us a step in the right direction. Futex is short for <em>&quot;fast userspace mutex&quot;</em>, it <em>is</em> a Mutex that is <em>fast</em> and in <em>userspace</em>. We all know what is meant by the term fast, but what does userspace mean in this context?</p>
 <p>Userspace is referring to any code that is <em>not</em> executed within the operating system kernel. There is a cost to transitioning our execution context into and out of the kernel (along with not knowing when the execution context will be returned), generally leading to increased latency. The goal then, is to remain in userspace as much as possible - this is what makes a Futex <em>fast</em>.</p>
 <h2>Mutex Breakdown</h2>
-<p>Now that we know what a Futex is, lets take a look at how we can split a Mutex into its constituent parts to review how it could be optimised for low latency. All modern desktop operating systems provide a range of kernel level synchronisation primitives, including a Mutex:</p>
+<p>Now that we know what a Futex is, let's take a look at how we can split a Mutex into its constituent parts to review how it could be optimised for low latency. All modern desktop operating systems provide a range of kernel level synchronisation primitives, including a Mutex:</p>
 <ul>
 <li>Windows; <a href="https://learn.microsoft.com/en-us/windows/win32/sync/using-mutex-objects" target="_blank" rel="noopener noreferrer">Using Mutex Objects</a></li>
 <li>Linux; <a href="https://linux.die.net/man/3/pthread_mutex_lock" target="_blank" rel="noopener noreferrer">Man Page: pthread_mutex_lock</a></li>
@@ -88,9 +88,9 @@
 <li><a href="https://en.cppreference.com/w/cpp/atomic/atomic_wait.html" target="_blank" rel="noopener noreferrer">std::atomic_wait</a></li>
 <li><a href="https://en.cppreference.com/w/cpp/atomic/atomic_notify_one.html" target="_blank" rel="noopener noreferrer">std::atomic_notify</a></li>
 </ul>
-<p>You may have noticed that the dates don't quite match up. These APIs were introduced in C++20, but Apple only added <em>usable</em> support for them in 2024. This does mean that another primitive was used to appoximate the behaviour on Mac, meaning it isn't possible to write a Futex with the lowest possible latency on Mac if we're using only the C++ standard library. We will also have to wait for a version of MacOS that supports these APIs to reach relative ubiquity before releasing software that uses them on Mac - luckily Apple are rather pushy with OS updates.</p>
+<p>You may have noticed that the dates don't quite match up. These APIs were introduced in C++20, but Apple only added <em>usable</em> support for them in 2024. This does mean that another primitive was used to approximate the behaviour on Mac, meaning it isn't possible to write a Futex with the lowest possible latency on Mac if we're using only the C++ standard library. We will also have to wait for a version of MacOS that supports these APIs to reach relative ubiquity before releasing software that uses them on Mac - luckily Apple are rather pushy with OS updates.</p>
 <h2>Putting it all together</h2>
-<p>Now that we have all of the tools required to implement a Futex, lets take a look at a complete draft implementation:</p>
+<p>Now that we have all of the tools required to implement a Futex, let's take a look at a complete draft implementation:</p>
 <pre style="background-color:#fdf6e3;">
 <span style="color:#cb4b16;">#include </span><span style="color:#839496;">&lt;</span><span style="color:#2aa198;">atomic</span><span style="color:#839496;">&gt;
 </span><span style="color:#657b83;">
@@ -140,11 +140,11 @@
 <p>The main changes to our previous code is as follows:</p>
 <ul>
 <li>Our state now consists of 3 options <em>unlocked</em>, <em>locked</em> &amp; <em>contended</em>; this is used to determine if a thread is waiting for the lock or not</li>
-<li>The atomic wait and notify have been added to the implemention using the <code>std::atomic&lt;T&gt;</code> wrappers</li>
+<li>The atomic wait and notify have been added to the implementation using the <code>std::atomic&lt;T&gt;</code> wrappers</li>
 <li>We've added an explicit <em>fast path</em> and <em>slow path</em> to the <code>lock</code> method</li>
 </ul>
 <p>The first thread to acquire the lock will succeed at the compare exchange strong (fast path) and early exit; in low contention scenarios acquiring the lock will be incredibly fast. If there is contention however, a single thread will succeed quickly while the others will fall into the while loop (slow path). These other threads will use atomic wait to await changes to the <code>_status</code> field.</p>
-<p>Once the first thread has completed its critical section, it will call <code>unlock</code> which will atomically <code>exchange</code> the state. <code>exchange</code> returns the previous value of the atomic, this is checked for if it is <em>contended</em> and if so atomic <code>notify</code> will be called to wake up a single waiting thread. The idea here is that if the state is <em>locked</em>, there is no threads waiting and therefore the notify call is not required - significantly reducing the cost of locking and unlocking if there is no contention.</p>
+<p>Once the first thread has completed its critical section, it will call <code>unlock</code> which will atomically <code>exchange</code> the state. <code>exchange</code> returns the previous value of the atomic, this is checked for if it is <em>contended</em> and if so atomic <code>notify</code> will be called to wake up a single waiting thread. The idea here is that if the state is <em>locked</em>, there are no threads waiting and therefore the notify call is not required - significantly reducing the cost of locking and unlocking if there is no contention.</p>
 <p>As a final note; we <em>must</em> assume that threads waiting could wake up without unlock being called, this is known as a &quot;spurious wake up&quot;. We have protected against this by trapping execution in a loop and restricting the exit conditions carefully.</p>
 <h2>What is next?</h2>
 <p>I do not claim for this to be a production ready implementation, there are many areas that could be improved, including the already mentioned protection against recursive locking and multiple unlocking. On top of these, there are also a number of additions that could be made to increase performance further, such as a limited low-power spin looping to attempt to <em>catch</em> cases where the lock is held for a very short period.</p>
@@ -155,7 +155,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Sun, 20 Jul 2025 01:25:58 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Sun, 20 Jul 2025 01:43:18 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
