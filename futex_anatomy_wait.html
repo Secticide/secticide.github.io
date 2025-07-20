@@ -138,7 +138,7 @@
 </span></pre>
 <p>The main changes to our previous implementation are as follows:</p>
 <ul>
-<li>Our Futex now supports 3 states to determine if a thread is waiting for the lock or not; <em>unlocked</em>, <em>locked</em> &amp; <em>contended</em></li>
+<li>In addition to the <em>unlocked</em> &amp; <em>locked</em> states (stored as a <code>bool</code> in the previous snippet), a <em>contended</em> state has been added to allow us to determine if a thread is waiting for the lock to be available</li>
 <li>The atomic wait and notify have been added using the <code>std::atomic&lt;T&gt;</code> wrappers</li>
 <li>An explicit <em>fast path</em> and <em>slow path</em> have been added to the <code>lock</code> method</li>
 </ul>
@@ -146,7 +146,7 @@
 <p>Once the first thread has completed its critical section, it will call <code>unlock</code> which will atomically <code>exchange</code> the state. <code>exchange</code> returns the previous value of the atomic, this is checked for if it is <em>contended</em> and if so atomic <code>notify</code> will be called to wake up a single waiting thread. The idea here is that if the state is <em>locked</em>, there are no threads waiting and therefore the notify call is not required - significantly reducing the cost of locking and unlocking if there is no contention.</p>
 <p>As a final note; we <em>must</em> assume that threads waiting could wake up without unlock being called, this is known as a &quot;spurious wake up&quot;. We have protected against this by trapping execution in a loop and restricting the exit conditions carefully.</p>
 <h2>What is next?</h2>
-<p>I do not claim for this to be a production ready implementation, there are many areas that could be improved, including the already mentioned protection against recursive locking and multiple unlocking. On top of these, there are also a number of additions that could be made to increase performance further, such as a limited low-power spin looping to attempt to <em>catch</em> cases where the lock is held for a very short period.</p>
+<p>Let's be clear, this is not a production ready implementation, many areas could be improved. Protection against recursive locking and multiple unlocking, as well as performance optimisations such as a limited low-power spin looping which would attempt to <em>catch</em> cases where the lock is held momentarily.</p>
 <p>The Rust standard library implementation is open source and easy to read and understand, if you would like to review something production ready: <a href="https://doc.rust-lang.org/nightly/src/std/sys/sync/mutex/futex.rs.html" target="_blank" rel="noopener noreferrer">futex.rs</a></p>
 
                 <div class="navigation">
@@ -154,7 +154,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Sun, 20 Jul 2025 02:25:33 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Sun, 20 Jul 2025 02:43:53 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
