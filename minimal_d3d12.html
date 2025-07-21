@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Jak Boulton | Graphics Samples: Minimal D3D12</title>
+        <link rel="icon" type="image/x-icon" href="assets/pull-request.svg"/>
+        <link rel="stylesheet" href="assets/styles.css">
+    </head>
+    <body class="terminal">
+        <div class="container">
+            <div class="title-bar">
+                <span><a href="/">&#10531; Home</a></span>
+                <img src="assets/pull-request.svg" class="window-icon">
+            </div>
+            <header>
+                <h1>Graphics Samples: Minimal D3D12</h1>
+                <time datetime="2024-10-07" class="date">7th October 2024</time>
+                <span class="reading-time">7 minute read</span>
+           </header>
+           <main>
+                <p>It has been a while since I've posted to this blog — over 4 years — but since I've spent the time to give it a nice new lick of paint, it's time to dust off the tomes and get back to blogging about my various software engineering and game development adventures. What better place to start than with a classic <em>Hello, Triangle</em> graphics sample?</p>
+<hr />
+<h2>Inspiration</h2>
+<p>A good few years back, I stumbled upon <a href="https://twitter.com/d7samurai" target="_blank" rel="noopener noreferrer">d7samurai</a>'s <a href="https://gist.github.com/d7samurai/261c69490cce0620d0bfc93003cd1052" target="_blank" rel="noopener noreferrer">Minimal D3D11</a> sample and have since used it as a reference point. When starting any graphics-based exploration using D3D11, I reference this example to get started quickly. On top of this, there are further samples that detail how certain graphics effects can be achieved, such as shadow mapping, instanced rendering, and various ways to structure your graphics code.</p>
+<p>When seeking a similar sample project for D3D12 or Vulkan, I have been unable to find something quite as simplistic (although I do have to call out the <a href="https://vulkan-tutorial.com/" target="_blank" rel="noopener noreferrer">Vulkan Tutorial</a> here as a great way to get started using the API). The only source I've found for D3D12 is the Microsoft-written <a href="https://github.com/microsoft/DirectX-Graphics-Samples/tree/master" target="_blank" rel="noopener noreferrer">DirectX Graphics Samples</a>, which are great but are missing the <em>minimal</em> element I'm seeking. I decided to write it myself, both to clarify my own understanding and in case it proves useful to others.</p>
+<hr />
+<h2>Minimal D3D12</h2>
+<p>Github link: <a href="https://github.com/Secticide/Graphics-Samples/blob/main/cpp/D3D12/Minimal-D3D12/main.cpp" target="_blank" rel="noopener noreferrer">Secticide/Graphics-Samples/cpp/D3D12/Minimal-D3D12/main.cpp</a></p>
+<p>The first part of the journey is a very simple <em>Hello, Triangle</em> example that shows how to open a window using the Win32 API, set up the render pipeline, and push render commands to a command buffer. Considering the verbosity of modern graphics APIs, it is good to see that all of this is possible in just under 350 lines of C++. Let's take a look through the steps required to get a triangle rendering in DirectX 12.</p>
+<h3>1. Opening A Window</h3>
+<p>The first thing any application needs to do is open a window. Most game-style applications use one of the popular cross-platform libraries like <a href="https://www.libsdl.org/" target="_blank" rel="noopener noreferrer">SDL2</a> (we're almost at <a href="https://wiki.libsdl.org/SDL3/FrontPage" target="_blank" rel="noopener noreferrer">SDL3</a>) or <a href="https://www.glfw.org/" target="_blank" rel="noopener noreferrer">GLFW</a>. While this approach simplifies porting applications to other platforms, this example is intentionally minimal and therefore sticks to Win32 APIs:</p>
+<pre style="background-color:#fdf6e3;">
+<span style="color:#657b83;">WNDCLASSW wnd_class{ </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, DefWindowProcW, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, TITLE };
+</span><span style="color:#657b83;">
+</span><span style="color:#b58900;">RegisterClassW</span><span style="color:#657b83;">(</span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">wnd_class);
+</span><span style="color:#657b83;">
+</span><span style="color:#859900;">HWND</span><span style="color:#657b83;"> hwnd{ </span><span style="color:#b58900;">CreateWindowExW</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, TITLE, TITLE, WS_POPUP | WS_MAXIMIZE | WS_VISIBLE, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">) };
+</span></pre>
+<p>This is about as simple as you can make it (we don't even check if the Window was created successfully).</p>
+<h3>2. Setting Up</h3>
+<p>With the window set up, we take our first step into the D3D12 APIs by setting up the <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12sdklayers/nn-d3d12sdklayers-id3d12debug" target="_blank" rel="noopener noreferrer">ID3D12Debug</a> object and enabling it. This helps us understand if we've incorrectly used an API. Most of the time when getting started with graphics programming, if an error is made in the setup of objects or an API function has been used incorrectly, the window will just display black. Enabling the debug layer gives us at least a <em>chance</em> at gaining some more information.</p>
+<pre style="background-color:#fdf6e3;">
+<span style="color:#657b83;">ComPtr&lt;ID3D12Debug&gt; debug_controller{};
+</span><span style="color:#b58900;">check</span><span style="color:#657b83;">(</span><span style="color:#b58900;">D3D12GetDebugInterface</span><span style="color:#657b83;">(</span><span style="color:#b58900;">IID_PPV_ARGS</span><span style="color:#657b83;">(</span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">debug_controller)));
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">debug_controller-&gt;</span><span style="color:#b58900;">EnableDebugLayer</span><span style="color:#657b83;">();
+</span></pre>
+<p>One other point of note is that I'm using the <a href="https://learn.microsoft.com/en-us/cpp/cppcx/wrl/windows-runtime-cpp-template-library-wrl" target="_blank" rel="noopener noreferrer">Windows Runtime Library</a>'s <code>ComPtr&lt;T&gt;</code> type, which nicely wraps all D3D12 objects in an <a href="https://learn.microsoft.com/en-us/cpp/cpp/object-lifetime-and-resource-management-modern-cpp" target="_blank" rel="noopener noreferrer">RAII</a> wrapper, managing object lifetimes for us. These are the Windows Runtime Library's equivalent of <T><a href="https://en.cppreference.com/w/cpp/memory/shared_ptr" target="_blank" rel="noopener noreferrer">std::shared_ptr</a>. Our next step is to set up our device, queues, and swap chain.</p>
+<pre style="background-color:#fdf6e3;">
+<span style="color:#657b83;">ComPtr&lt;ID3D12Device&gt; device{};
+</span><span style="color:#b58900;">check</span><span style="color:#657b83;">(</span><span style="color:#b58900;">D3D12CreateDevice</span><span style="color:#657b83;">(</span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">, D3D_FEATURE_LEVEL_12_0, </span><span style="color:#b58900;">IID_PPV_ARGS</span><span style="color:#657b83;">(</span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">device)));
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">D3D12_COMMAND_QUEUE_DESC queue_desc{};
+</span><span style="color:#657b83;">queue_desc.</span><span style="color:#268bd2;">Flags </span><span style="color:#657b83;">= D3D12_COMMAND_QUEUE_FLAG_NONE;
+</span><span style="color:#657b83;">queue_desc.</span><span style="color:#268bd2;">Type </span><span style="color:#657b83;">= D3D12_COMMAND_LIST_TYPE_DIRECT;
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">ComPtr&lt;ID3D12CommandQueue&gt; cmd_queue{};
+</span><span style="color:#b58900;">check</span><span style="color:#657b83;">(device-&gt;</span><span style="color:#b58900;">CreateCommandQueue</span><span style="color:#657b83;">(</span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">queue_desc, </span><span style="color:#b58900;">IID_PPV_ARGS</span><span style="color:#657b83;">(</span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">cmd_queue)));
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">ComPtr&lt;IDXGIFactory4&gt; factory{};
+</span><span style="color:#b58900;">check</span><span style="color:#657b83;">(</span><span style="color:#b58900;">CreateDXGIFactory2</span><span style="color:#657b83;">(DXGI_CREATE_FACTORY_DEBUG, </span><span style="color:#b58900;">IID_PPV_ARGS</span><span style="color:#657b83;">(</span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">factory)));
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">DXGI_SWAP_CHAIN_DESC1 swapchain_desc{};
+</span><span style="color:#657b83;">swapchain_desc.</span><span style="color:#268bd2;">BufferCount </span><span style="color:#657b83;">= </span><span style="color:#6c71c4;">2</span><span style="color:#657b83;">;
+</span><span style="color:#657b83;">swapchain_desc.</span><span style="color:#268bd2;">Width </span><span style="color:#657b83;">= </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">; </span><span style="color:#93a1a1;">// use window width
+</span><span style="color:#657b83;">swapchain_desc.</span><span style="color:#268bd2;">Height </span><span style="color:#657b83;">= </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">; </span><span style="color:#93a1a1;">// use window height
+</span><span style="color:#657b83;">swapchain_desc.</span><span style="color:#268bd2;">Format </span><span style="color:#657b83;">= DXGI_FORMAT_R8G8B8A8_UNORM;
+</span><span style="color:#657b83;">swapchain_desc.</span><span style="color:#268bd2;">BufferUsage </span><span style="color:#657b83;">= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+</span><span style="color:#657b83;">swapchain_desc.</span><span style="color:#268bd2;">SwapEffect </span><span style="color:#657b83;">= DXGI_SWAP_EFFECT_FLIP_DISCARD;
+</span><span style="color:#657b83;">swapchain_desc.</span><span style="color:#268bd2;">SampleDesc</span><span style="color:#657b83;">.</span><span style="color:#268bd2;">Count </span><span style="color:#657b83;">= </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">;
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">ComPtr&lt;IDXGISwapChain1&gt; swapchain1{};
+</span><span style="color:#b58900;">check</span><span style="color:#657b83;">(factory-&gt;</span><span style="color:#b58900;">CreateSwapChainForHwnd</span><span style="color:#657b83;">(cmd_queue.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(), hwnd, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">swapchain_desc, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">swapchain1));
+</span></pre>
+<p>Something to note is that for this minimal example, I used a <code>check</code> function that ensures the returned <a href="https://en.wikipedia.org/wiki/HRESULT" target="_blank" rel="noopener noreferrer">HRESULT</a> is a success. If not, the program is terminated via <a href="https://en.cppreference.com/w/cpp/utility/program/exit" target="_blank" rel="noopener noreferrer">std::exit</a>.</p>
+<p>This is followed by the creation of render targets for the swap chain, compilation of shaders, and setup of the general graphics pipeline state, all of which I won't show here (feel free to check the code out in the repository). The most important parts, or the parts that differentiate D3D12 from D3D11, are the following:</p>
+<ul>
+<li>
+<p><a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12descriptorheap" target="_blank" rel="noopener noreferrer">ID3D12DescriptorHeap</a> Creation</p>
+<blockquote>
+<p>A descriptor heap is a collection of contiguous allocations of descriptors, one allocation for every descriptor. Descriptor heaps contain many object types that are not part of a Pipeline State Object (PSO), such as Shader Resource Views (SRVs), Unordered Access Views (UAVs), Constant Buffer Views (CBVs), and Samplers.</p>
+</blockquote>
+</li>
+<li>
+<p><a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12rootsignature" target="_blank" rel="noopener noreferrer">ID3D12RootSignature</a> Creation</p>
+<blockquote>
+<p>The root signature defines what resources are bound to the graphics pipeline. A root signature is configured by the app and links command lists to the resources the shaders require. Currently, there is one graphics and one compute root signature per app.</p>
+</blockquote>
+</li>
+<li>
+<p><a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12commandallocator" target="_blank" rel="noopener noreferrer">ID3D12CommandAllocator</a> Creation</p>
+<blockquote>
+<p>Represents the allocations of storage for graphics processing unit (GPU) commands.</p>
+</blockquote>
+</li>
+</ul>
+<p>With all of these objects set up, we have essentially completed the setup of the graphics pipeline or <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12pipelinestate" target="_blank" rel="noopener noreferrer">ID3D12PipelineState</a>. We are now ready to move forward to setting up our data for rendering. Much like D3D11, we start by creating and filling buffers - in this case, a very simple buffer for the vertex data. Some additional key points to mention are the creation of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12graphicscommandlist" target="_blank" rel="noopener noreferrer">ID3D12GraphicsCommandList</a> for storing our render commands and a <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12fence" target="_blank" rel="noopener noreferrer">ID3D12Fence</a> for synchronisation between the CPU and GPU.</p>
+<h3>3. The Render Loop</h3>
+<p>The render loop consists of the following steps:</p>
+<ul>
+<li>Resetting the command allocator</li>
+<li>Resetting the command list</li>
+<li>Setting the root signature, viewport, and scissor rectangle</li>
+<li>Transitioning one of the swap chain's buffers from the present state to the render target state</li>
+<li>Setting the render target</li>
+<li>Clearing the buffer</li>
+<li>Setting the primitive topology</li>
+<li>Setting the vertex buffer</li>
+<li>Calling <code>DrawInstanced</code> to perform the rendering</li>
+<li>Transitioning the current render target back to the present state</li>
+<li>Closing the command list</li>
+<li>Calling <code>Present</code> on the swap chain</li>
+<li>Signaling and waiting on the fence (waiting for the GPU to complete its tasks)</li>
+</ul>
+<pre style="background-color:#fdf6e3;">
+<span style="color:#657b83;">cmd_allocator-&gt;</span><span style="color:#b58900;">Reset</span><span style="color:#657b83;">();
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">Reset</span><span style="color:#657b83;">(cmd_allocator.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(), pipeline_state.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">());
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">SetGraphicsRootSignature</span><span style="color:#657b83;">(root_signature.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">());
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">RSSetViewports</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">viewport);
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">RSSetScissorRects</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">scissor);
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">D3D12_RESOURCE_BARRIER barrier{};
+</span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Type </span><span style="color:#657b83;">= D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+</span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Flags </span><span style="color:#657b83;">= D3D12_RESOURCE_BARRIER_FLAG_NONE;
+</span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Transition </span><span style="color:#657b83;">= {
+</span><span style="color:#657b83;">    render_targets</span><span style="color:#268bd2;">[</span><span style="color:#657b83;">frame_index</span><span style="color:#268bd2;">]</span><span style="color:#657b83;">.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(),
+</span><span style="color:#657b83;">    D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_PRESENT,
+</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_RENDER_TARGET
+</span><span style="color:#657b83;">};
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">ResourceBarrier</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">barrier);
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">rtv_handle = rtv_heap-&gt;</span><span style="color:#b58900;">GetCPUDescriptorHandleForHeapStart</span><span style="color:#657b83;">();
+</span><span style="color:#657b83;">rtv_handle.</span><span style="color:#268bd2;">ptr </span><span style="color:#657b83;">= </span><span style="color:#859900;">SIZE_T</span><span style="color:#657b83;">(</span><span style="color:#859900;">INT64</span><span style="color:#657b83;">(rtv_handle.</span><span style="color:#268bd2;">ptr</span><span style="color:#657b83;">) + </span><span style="color:#859900;">INT64</span><span style="color:#657b83;">(frame_index) </span><span style="color:#859900;">* INT64</span><span style="color:#657b83;">(rtv_descriptor_size));
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">OMSetRenderTargets</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">rtv_handle, </span><span style="color:#b58900;">FALSE</span><span style="color:#657b83;">, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">);
+</span><span style="color:#657b83;">
+</span><span style="color:#859900;">const </span><span style="color:#268bd2;">float</span><span style="color:#657b83;"> clear_colour</span><span style="color:#268bd2;">[]</span><span style="color:#657b83;">{ </span><span style="color:#6c71c4;">0.0f</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0.2f</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0.4f</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">1.0f </span><span style="color:#657b83;">};
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">ClearRenderTargetView</span><span style="color:#657b83;">(rtv_handle, clear_colour, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#b58900;">nullptr</span><span style="color:#657b83;">);
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">IASetPrimitiveTopology</span><span style="color:#657b83;">(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">IASetVertexBuffers</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">vertex_buffer_view);
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">DrawInstanced</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">3</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">);
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Transition </span><span style="color:#657b83;">= {
+</span><span style="color:#657b83;">    render_targets</span><span style="color:#268bd2;">[</span><span style="color:#657b83;">frame_index</span><span style="color:#268bd2;">]</span><span style="color:#657b83;">.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(),
+</span><span style="color:#657b83;">    D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_RENDER_TARGET,
+</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_PRESENT
+</span><span style="color:#657b83;">};
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">ResourceBarrier</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">barrier);
+</span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">Close</span><span style="color:#657b83;">();
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">ID3D12CommandList</span><span style="color:#859900;">*</span><span style="color:#657b83;"> cmd_lists</span><span style="color:#268bd2;">[]</span><span style="color:#657b83;">{ cmd_list.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">() };
+</span><span style="color:#657b83;">cmd_queue-&gt;</span><span style="color:#b58900;">ExecuteCommandLists</span><span style="color:#657b83;">(</span><span style="color:#b58900;">std::size</span><span style="color:#657b83;">(cmd_lists), cmd_lists);
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">swapchain-&gt;</span><span style="color:#b58900;">Present</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">);
+</span><span style="color:#657b83;">
+</span><span style="color:#859900;">const UINT64</span><span style="color:#657b83;"> current_fence_value{ fence_value };
+</span><span style="color:#657b83;">cmd_queue-&gt;</span><span style="color:#b58900;">Signal</span><span style="color:#657b83;">(fence.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(), current_fence_value);
+</span><span style="color:#657b83;">fence_value += </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">;
+</span><span style="color:#657b83;">
+</span><span style="color:#859900;">if </span><span style="color:#657b83;">(fence-&gt;</span><span style="color:#b58900;">GetCompletedValue</span><span style="color:#657b83;">() &lt; current_fence_value) {
+</span><span style="color:#657b83;">    fence-&gt;</span><span style="color:#b58900;">SetEventOnCompletion</span><span style="color:#657b83;">(current_fence_value, fence_event);
+</span><span style="color:#657b83;">    </span><span style="color:#b58900;">WaitForSingleObject</span><span style="color:#657b83;">(fence_event, INFINITE);
+</span><span style="color:#657b83;">}
+</span><span style="color:#657b83;">
+</span><span style="color:#657b83;">frame_index = swapchain-&gt;</span><span style="color:#b58900;">GetCurrentBackBufferIndex</span><span style="color:#657b83;">();
+</span></pre>
+<p>There we have it, about the simpliest D3D12 program that you can write!</p>
+<hr />
+<h2>What's Next</h2>
+<p>You may notice a few future plans subtly implied byt the repository setup. Firstly, it is titled <em>Graphics Samples</em>, which of course hints at future plans to expand the repository beyond the <em>Hello, Triangle</em> sample. I intend to follow a similar journey to <a href="https://twitter.com/d7samurai" target="_blank" rel="noopener noreferrer">d7samurai</a>'s samples by showcasing other minimal samples for various graphics techniques. As indicated by the folder structure present in the repository; I additionally plan to write ports of these samples to Vulkan. Finally, I'd like to expand the repository further and implement some of these graphics techniques in Rust and Zig, let's see how far we can get!</p>
+
+                <div class="navigation">
+    <span class="top-text">
+        <a href="#top">&#10532; Back To Top</a>
+    </span>
+    <span class="flavour-text">
+        Gdt Mon, 21 Jul 2025 23:25:53 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
+        UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
+        LF&nbsp;&nbsp;&nbsp;&nbsp;
+        HTML&nbsp;&nbsp;&nbsp;&nbsp;&#10064;
+    </span>
+</div>
+           </main>
+       </div>
+    </body>
+</html>

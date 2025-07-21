@@ -145,7 +145,7 @@
 <p>The first thread to acquire the lock will succeed at the compare exchange strong (fast path) and early exit; in low contention scenarios acquiring the lock will be incredibly fast. If there is contention however, a single thread will succeed quickly while the others will fall into the while loop (slow path). These other threads will use atomic wait to await changes to the <code>_status</code> field.</p>
 <p>Once the first thread has completed its critical section, it will call <code>unlock</code> which will atomically <code>exchange</code> the state. <code>exchange</code> returns the previous value of the atomic, this is checked for if it is <em>contended</em> and if so atomic <code>notify</code> will be called to wake up a single waiting thread. The idea here is that if the state is <em>locked</em>, there are no threads waiting and therefore the notify call is not required - significantly reducing the cost of locking and unlocking if there is no contention.</p>
 <p>As a final note; we <em>must</em> assume that threads waiting could wake up without unlock being called, this is known as a &quot;spurious wake up&quot;. We have protected against this by trapping execution in a loop and restricting the exit conditions carefully.</p>
-<h2>What is next?</h2>
+<h2>What's Next</h2>
 <p>Let's be clear, this is not a production ready implementation, many areas could be improved. Protection against recursive locking and multiple unlocking, as well as performance optimisations such as a limited low-power spin looping which would attempt to <em>catch</em> cases where the lock is held momentarily.</p>
 <p>The Rust standard library implementation is open source and easy to read and understand, if you would like to review something production ready: <a href="https://doc.rust-lang.org/nightly/src/std/sys/sync/mutex/futex.rs.html" target="_blank" rel="noopener noreferrer">futex.rs</a></p>
 
@@ -154,7 +154,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Mon, 21 Jul 2025 22:48:33 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Mon, 21 Jul 2025 23:25:53 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
