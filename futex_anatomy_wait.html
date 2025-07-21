@@ -35,8 +35,8 @@
 <li>Linux; <a href="https://linux.die.net/man/3/pthread_mutex_lock" target="_blank" rel="noopener noreferrer">Man Page: pthread_mutex_lock</a></li>
 <li>Mac; <a href="https://developer.apple.com/documentation/synchronization/mutex" target="_blank" rel="noopener noreferrer">Developer Documentation: Mutex</a></li>
 </ul>
-<p>The consistent issue shared by these primitives is that using them forces us into kernel space when acquiring or releasing the lock and so we will have to pay the associated performance and latency cost. What can we do to resolve this?</p>
-<p>Reviewing the behaviour of a Mutex; what parts are needed for the implementation? First, we need some state to determine if a lock is currently in use - and it <em>must</em> be atomic due to multithreaded requirement:</p>
+<p>The consistent issue shared by these primitives is that using them forces us into kernel space when acquiring or releasing the lock and so we will have to pay the associated performance and latency cost. This can however be vastly reduced by using lighter weight primitives.</p>
+<p>The first part required to implement Mutex behaviour is a piece of state to determine whether the lock is currently in use. A Mutex must be capable of being used by effectively any number of threads and so our locked state <em>must</em> be atomic:</p>
 <pre style="background-color:#fdf6e3;">
 <span style="color:#cb4b16;">#include </span><span style="color:#839496;">&lt;</span><span style="color:#2aa198;">atomic</span><span style="color:#839496;">&gt;
 </span><span style="color:#657b83;">
@@ -73,7 +73,7 @@
 </span><span style="color:#657b83;">    }
 </span><span style="color:#657b83;">};
 </span></pre>
-<p>This implementation is <em>technically</em> already complete, assuming there is no misuse (like recursively calling lock or calling release when the lock isn't held). This is also incredibly fast when used in low contention scenarios due to locking and unlocking requiring a single atomic operation.</p>
+<p>This implementation is <em>technically</em> already complete, assuming there is no misuse (like recursively calling lock or calling release when the lock isn't held). It is also incredibly fast when used in low contention scenarios due to locking and unlocking requiring a single atomic operation.</p>
 <p>The problem is that all threads waiting for the lock will spin-loop until the lock is available - not good. We need a means to sleep the thread while it waits for the lock, and to then reawaken it when the lock is available.</p>
 <h2>Atomic Wait &amp; Notify</h2>
 <p>One option would be to use the operating system primitives listed above to sleep the threads; but we can do better! All desktop operating systems also provide a low-cost primitive for sleeping and waking threads:</p>
@@ -154,7 +154,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Mon, 21 Jul 2025 22:21:16 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Mon, 21 Jul 2025 22:39:57 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
