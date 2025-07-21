@@ -26,10 +26,10 @@ body {
   color: var(--color-text);
   font-size: 1.2rem;
   line-height: 1.8rem;
+  text-align: left;
 }
 
 header {
-  text-align: left;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 2rem;
   padding-bottom: 1rem;
@@ -50,7 +50,6 @@ hr {
 p {
   margin-top: 2rem;
   margin-bottom: 2rem;
-  text-align: justify;
 }
 
 article {
