@@ -37,10 +37,12 @@ header {
 
 h1 {
   color: var(--color-header);
+  line-height: normal;
 }
 
 h2 {
   color: var(--color-subheader);
+  line-height: normal;
 }
 
 hr {
