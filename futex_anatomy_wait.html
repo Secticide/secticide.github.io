@@ -37,41 +37,41 @@
 </ul>
 <p>The consistent issue shared by these primitives is that using them forces us into kernel space when acquiring or releasing the lock and so we will have to pay the associated performance and latency cost. This can however be vastly reduced by using lighter weight primitives.</p>
 <p>The first part required to implement Mutex behaviour is a piece of state to determine whether the lock is currently in use. A Mutex must be capable of being used by effectively any number of threads and so our locked state <em>must</em> be atomic:</p>
-<pre style="background-color:#fdf6e3;">
-<span style="color:#cb4b16;">#include </span><span style="color:#839496;">&lt;</span><span style="color:#2aa198;">atomic</span><span style="color:#839496;">&gt;
-</span><span style="color:#657b83;">
-</span><span style="color:#268bd2;">class </span><span style="color:#b58900;">futex </span><span style="color:#657b83;">{
-</span><span style="color:#657b83;">	std::atomic_bool _is_locked;
-</span><span style="color:#657b83;">};
+<pre style="background-color:#111218;">
+<span style="color:#ff8f40;">#include </span><span style="color:#d3d0c8;">&lt;</span><span style="color:#bfbdb6;">atomic</span><span style="color:#d3d0c8;">&gt;
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#ff8f40;">class </span><span style="color:#ffcc66;">futex </span><span style="color:#bfbdb6;">{
+</span><span style="color:#bfbdb6;">	std::atomic_bool _is_locked;
+</span><span style="color:#bfbdb6;">}</span><span style="color:#d3d0c8;">;
 </span></pre>
 <p>We then need a <code>lock</code> or <code>acquire</code> method to exclusively acquire the lock and an <code>unlock</code> or <code>release</code> method to give other threads access to the lock:</p>
-<pre style="background-color:#fdf6e3;">
-<span style="color:#cb4b16;">#include </span><span style="color:#839496;">&lt;</span><span style="color:#2aa198;">atomic</span><span style="color:#839496;">&gt;
-</span><span style="color:#657b83;">
-</span><span style="color:#268bd2;">class </span><span style="color:#b58900;">futex </span><span style="color:#657b83;">{
-</span><span style="color:#657b83;">	std::atomic_bool _is_locked;
-</span><span style="color:#657b83;">
-</span><span style="color:#859900;">public</span><span style="color:#657b83;">:
-</span><span style="color:#657b83;">	</span><span style="color:#b58900;">futex</span><span style="color:#657b83;">() = </span><span style="color:#859900;">default</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">// other constructors ...
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">void </span><span style="color:#b58900;">lock</span><span style="color:#657b83;">() {
-</span><span style="color:#657b83;">		</span><span style="color:#859900;">while </span><span style="color:#657b83;">(</span><span style="color:#b58900;">true</span><span style="color:#657b83;">) {
-</span><span style="color:#657b83;">			</span><span style="color:#268bd2;">bool</span><span style="color:#657b83;"> expected = </span><span style="color:#b58900;">false</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">			</span><span style="color:#859900;">if </span><span style="color:#657b83;">(_is_locked.</span><span style="color:#b58900;">compare_exchange_weak</span><span style="color:#657b83;">(
-</span><span style="color:#657b83;">					expected, </span><span style="color:#b58900;">true</span><span style="color:#657b83;">,
-</span><span style="color:#657b83;">					std::memory_order_acquire,
-</span><span style="color:#657b83;">					std::memory_order_relaxed)) {
-</span><span style="color:#657b83;">				</span><span style="color:#859900;">break</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">			}
-</span><span style="color:#657b83;">		}
-</span><span style="color:#657b83;">	}
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">void </span><span style="color:#b58900;">unlock</span><span style="color:#657b83;">() {
-</span><span style="color:#657b83;">		_is_locked.</span><span style="color:#b58900;">store</span><span style="color:#657b83;">(</span><span style="color:#b58900;">false</span><span style="color:#657b83;">, std::memory_order_release);
-</span><span style="color:#657b83;">	}
-</span><span style="color:#657b83;">};
+<pre style="background-color:#111218;">
+<span style="color:#ff8f40;">#include </span><span style="color:#d3d0c8;">&lt;</span><span style="color:#bfbdb6;">atomic</span><span style="color:#d3d0c8;">&gt;
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#ff8f40;">class </span><span style="color:#ffcc66;">futex </span><span style="color:#bfbdb6;">{
+</span><span style="color:#bfbdb6;">	std::atomic_bool _is_locked;
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#ff8f40;">public</span><span style="color:#bfbdb6;">:
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ffb454;">futex</span><span style="color:#bfbdb6;">() </span><span style="color:#d3d0c8;">= </span><span style="color:#ff8f40;">default</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">	</span><span style="font-style:italic;color:#acb6bf8c;">// other constructors ...
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ff8f40;">void </span><span style="color:#ffb454;">lock</span><span style="color:#bfbdb6;">() {
+</span><span style="color:#bfbdb6;">		</span><span style="color:#ff8f40;">while </span><span style="color:#bfbdb6;">(</span><span style="color:#f99157;">true</span><span style="color:#bfbdb6;">) {
+</span><span style="color:#bfbdb6;">			</span><span style="color:#ff8f40;">bool</span><span style="color:#bfbdb6;"> expected </span><span style="color:#d3d0c8;">= </span><span style="color:#f99157;">false</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">			</span><span style="color:#ff8f40;">if </span><span style="color:#bfbdb6;">(_is_locked.</span><span style="color:#39bae6;">compare_exchange_weak</span><span style="color:#bfbdb6;">(
+</span><span style="color:#bfbdb6;">					expected, </span><span style="color:#f99157;">true</span><span style="color:#bfbdb6;">,
+</span><span style="color:#bfbdb6;">					std::memory_order_acquire,
+</span><span style="color:#bfbdb6;">					std::memory_order_relaxed)) {
+</span><span style="color:#bfbdb6;">				</span><span style="color:#ff8f40;">break</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">			}
+</span><span style="color:#bfbdb6;">		}
+</span><span style="color:#bfbdb6;">	}
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ff8f40;">void </span><span style="color:#ffb454;">unlock</span><span style="color:#bfbdb6;">() {
+</span><span style="color:#bfbdb6;">		_is_locked.</span><span style="color:#39bae6;">store</span><span style="color:#bfbdb6;">(</span><span style="color:#f99157;">false</span><span style="color:#bfbdb6;">, std::memory_order_release);
+</span><span style="color:#bfbdb6;">	}
+</span><span style="color:#bfbdb6;">}</span><span style="color:#d3d0c8;">;
 </span></pre>
 <p>This implementation is <em>technically</em> already complete, assuming there is no misuse (like recursively calling lock or calling release when the lock isn't held). It is also incredibly fast when used in low contention scenarios due to locking and unlocking requiring a single atomic operation.</p>
 <p>The problem is that all threads waiting for the lock will spin-loop until the lock is available - not good. We need a means to sleep the thread while it waits for the lock, and to then reawaken it when the lock is available.</p>
@@ -90,51 +90,51 @@
 <p>Interestingly, this has been a problem area for standards implementers on Mac for some time due to syscalls being a violation of Apple's store guidelines. The Mac APIs linked above were introduced with XCode 15.4, released in May 2024. The implementations of <code>std::atomic_wait</code> and <code>std::atomic_notify</code> on Mac are approximated using a non-Futex primitive.</p>
 <h2>Putting it all together</h2>
 <p>Now that we have all of the tools required to implement a Futex, let's take a look at a complete draft implementation:</p>
-<pre style="background-color:#fdf6e3;">
-<span style="color:#cb4b16;">#include </span><span style="color:#839496;">&lt;</span><span style="color:#2aa198;">atomic</span><span style="color:#839496;">&gt;
-</span><span style="color:#657b83;">
-</span><span style="color:#268bd2;">class </span><span style="color:#b58900;">futex </span><span style="color:#657b83;">{
-</span><span style="color:#657b83;">	</span><span style="color:#859900;">constexpr static uint8_t</span><span style="color:#657b83;"> status_unlocked = </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">	</span><span style="color:#859900;">constexpr static uint8_t</span><span style="color:#657b83;"> status_locked = </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">	</span><span style="color:#859900;">constexpr static uint8_t</span><span style="color:#657b83;"> status_contended = </span><span style="color:#6c71c4;">2</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">	std::atomic&lt;</span><span style="color:#859900;">uint8_t</span><span style="color:#657b83;">&gt; _status;
-</span><span style="color:#657b83;">
-</span><span style="color:#859900;">public</span><span style="color:#657b83;">:
-</span><span style="color:#657b83;">	</span><span style="color:#b58900;">futex</span><span style="color:#657b83;">() = </span><span style="color:#859900;">default</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">// other constructors ...
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">void </span><span style="color:#b58900;">lock</span><span style="color:#657b83;">() {
-</span><span style="color:#657b83;">		</span><span style="color:#859900;">uint8_t</span><span style="color:#657b83;"> expected = status_unlocked;
-</span><span style="color:#657b83;">		</span><span style="color:#859900;">if </span><span style="color:#657b83;">(_status.</span><span style="color:#b58900;">compare_exchange_strong</span><span style="color:#657b83;">(expected, status_locked,
-</span><span style="color:#657b83;">				std::memory_order_acquire, std::memory_order_relaxed)) {
-</span><span style="color:#657b83;">			</span><span style="color:#859900;">return</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">		}
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">		</span><span style="color:#859900;">while </span><span style="color:#657b83;">(</span><span style="color:#b58900;">true</span><span style="color:#657b83;">) {
-</span><span style="color:#657b83;">			</span><span style="color:#859900;">if </span><span style="color:#657b83;">(expected != status_contended) {
-</span><span style="color:#657b83;">				</span><span style="color:#859900;">const uint8_t</span><span style="color:#657b83;"> desired = expected + </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">				</span><span style="color:#859900;">if </span><span style="color:#657b83;">(_status.</span><span style="color:#b58900;">compare_exchange_weak</span><span style="color:#657b83;">(expected, desired,
-</span><span style="color:#657b83;">						std::memory_order_acquire, std::memory_order_relaxed)) {
-</span><span style="color:#657b83;">					</span><span style="color:#859900;">if </span><span style="color:#657b83;">(desired == status_locked) {
-</span><span style="color:#657b83;">						</span><span style="color:#859900;">return</span><span style="color:#657b83;">;
-</span><span style="color:#657b83;">					}
-</span><span style="color:#657b83;">				}
-</span><span style="color:#657b83;">			}
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">			_status.</span><span style="color:#b58900;">wait</span><span style="color:#657b83;">(status_contended, std::memory_order_acquire);
-</span><span style="color:#657b83;">			expected = _status.</span><span style="color:#b58900;">load</span><span style="color:#657b83;">(std::memory_order_relaxed);
-</span><span style="color:#657b83;">		}
-</span><span style="color:#657b83;">	}
-</span><span style="color:#657b83;">
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">void </span><span style="color:#b58900;">unlock</span><span style="color:#657b83;">() {
-</span><span style="color:#657b83;">		</span><span style="color:#859900;">if </span><span style="color:#657b83;">(_status.</span><span style="color:#b58900;">exchange</span><span style="color:#657b83;">(status_unlocked,
-</span><span style="color:#657b83;">				std::memory_order_release) == status_contended) {
-</span><span style="color:#657b83;">			_status.</span><span style="color:#b58900;">notify_one</span><span style="color:#657b83;">();
-</span><span style="color:#657b83;">		}
-</span><span style="color:#657b83;">	}
-</span><span style="color:#657b83;">};
+<pre style="background-color:#111218;">
+<span style="color:#ff8f40;">#include </span><span style="color:#d3d0c8;">&lt;</span><span style="color:#bfbdb6;">atomic</span><span style="color:#d3d0c8;">&gt;
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#ff8f40;">class </span><span style="color:#ffcc66;">futex </span><span style="color:#bfbdb6;">{
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ff8f40;">constexpr static </span><span style="color:#bfbdb6;">uint8_t status_unlocked </span><span style="color:#d3d0c8;">= </span><span style="color:#f99157;">0</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ff8f40;">constexpr static </span><span style="color:#bfbdb6;">uint8_t status_locked </span><span style="color:#d3d0c8;">= </span><span style="color:#f99157;">1</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ff8f40;">constexpr static </span><span style="color:#bfbdb6;">uint8_t status_contended </span><span style="color:#d3d0c8;">= </span><span style="color:#f99157;">2</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">	std::atomic&lt;uint8_t&gt; _status;
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#ff8f40;">public</span><span style="color:#bfbdb6;">:
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ffb454;">futex</span><span style="color:#bfbdb6;">() </span><span style="color:#d3d0c8;">= </span><span style="color:#ff8f40;">default</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">	</span><span style="font-style:italic;color:#acb6bf8c;">// other constructors ...
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ff8f40;">void </span><span style="color:#ffb454;">lock</span><span style="color:#bfbdb6;">() {
+</span><span style="color:#bfbdb6;">		uint8_t expected </span><span style="color:#d3d0c8;">=</span><span style="color:#bfbdb6;"> status_unlocked;
+</span><span style="color:#bfbdb6;">		</span><span style="color:#ff8f40;">if </span><span style="color:#bfbdb6;">(_status.</span><span style="color:#39bae6;">compare_exchange_strong</span><span style="color:#bfbdb6;">(expected, status_locked,
+</span><span style="color:#bfbdb6;">				std::memory_order_acquire, std::memory_order_relaxed)) {
+</span><span style="color:#bfbdb6;">			</span><span style="color:#ff8f40;">return</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">		}
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">		</span><span style="color:#ff8f40;">while </span><span style="color:#bfbdb6;">(</span><span style="color:#f99157;">true</span><span style="color:#bfbdb6;">) {
+</span><span style="color:#bfbdb6;">			</span><span style="color:#ff8f40;">if </span><span style="color:#bfbdb6;">(expected </span><span style="color:#d3d0c8;">!=</span><span style="color:#bfbdb6;"> status_contended) {
+</span><span style="color:#bfbdb6;">				</span><span style="color:#ff8f40;">const </span><span style="color:#bfbdb6;">uint8_t desired </span><span style="color:#d3d0c8;">=</span><span style="color:#bfbdb6;"> expected </span><span style="color:#d3d0c8;">+ </span><span style="color:#f99157;">1</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">				</span><span style="color:#ff8f40;">if </span><span style="color:#bfbdb6;">(_status.</span><span style="color:#39bae6;">compare_exchange_weak</span><span style="color:#bfbdb6;">(expected, desired,
+</span><span style="color:#bfbdb6;">						std::memory_order_acquire, std::memory_order_relaxed)) {
+</span><span style="color:#bfbdb6;">					</span><span style="color:#ff8f40;">if </span><span style="color:#bfbdb6;">(desired </span><span style="color:#d3d0c8;">==</span><span style="color:#bfbdb6;"> status_locked) {
+</span><span style="color:#bfbdb6;">						</span><span style="color:#ff8f40;">return</span><span style="color:#bfbdb6;">;
+</span><span style="color:#bfbdb6;">					}
+</span><span style="color:#bfbdb6;">				}
+</span><span style="color:#bfbdb6;">			}
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">			_status.</span><span style="color:#39bae6;">wait</span><span style="color:#bfbdb6;">(status_contended, std::memory_order_acquire);
+</span><span style="color:#bfbdb6;">			expected </span><span style="color:#d3d0c8;">=</span><span style="color:#bfbdb6;"> _status.</span><span style="color:#39bae6;">load</span><span style="color:#bfbdb6;">(std::memory_order_relaxed);
+</span><span style="color:#bfbdb6;">		}
+</span><span style="color:#bfbdb6;">	}
+</span><span style="color:#bfbdb6;">
+</span><span style="color:#bfbdb6;">	</span><span style="color:#ff8f40;">void </span><span style="color:#ffb454;">unlock</span><span style="color:#bfbdb6;">() {
+</span><span style="color:#bfbdb6;">		</span><span style="color:#ff8f40;">if </span><span style="color:#bfbdb6;">(_status.</span><span style="color:#39bae6;">exchange</span><span style="color:#bfbdb6;">(status_unlocked,
+</span><span style="color:#bfbdb6;">				std::memory_order_release) </span><span style="color:#d3d0c8;">==</span><span style="color:#bfbdb6;"> status_contended) {
+</span><span style="color:#bfbdb6;">			_status.</span><span style="color:#39bae6;">notify_one</span><span style="color:#bfbdb6;">();
+</span><span style="color:#bfbdb6;">		}
+</span><span style="color:#bfbdb6;">	}
+</span><span style="color:#bfbdb6;">}</span><span style="color:#d3d0c8;">;
 </span></pre>
 <p>The main changes to our previous implementation are as follows:</p>
 <ul>
@@ -154,7 +154,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Thu, 24 Jul 2025 22:25:34 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Fri, 25 Jul 2025 00:14:08 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;

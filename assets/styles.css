@@ -18,6 +18,8 @@
   --color-code: #8eccec;
   --color-highlight: #cfed95;
   --color-muted: #63676ccc;
+
+  scrollbar-color: var(--color-text) transparent;
 }
 
 body {
@@ -77,8 +79,8 @@ pre {
   line-height: 1.4rem;
   margin-left: calc(var(--container-padding) * -1);
   margin-right: calc(var(--container-padding) * -1);
-  overflow: auto;
   tab-size: var(--code-tab-size);
+  overflow: auto;
 }
 
 blockquote {

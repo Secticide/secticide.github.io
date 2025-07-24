@@ -40,40 +40,40 @@
 <h2>Setup</h2>
 <p>The Rust package directory crates.io contains a great deal of libraries we could use for parsing command line arguments. We were able to integrate and evaluate a number of packages very quickly and the consistent documentation generation allowed us to look past the set dressing and get straight to the information we desired.</p>
 <p>We settled on using <a href="https://github.com/clap-rs/clap" target="_blank" rel="noopener noreferrer">clap</a> as our command line argument parser. It offers a variety of patterns for defining the arguments your tool expects (a complete listing can be found on the <a href="https://docs.rs/clap/2.33.1/clap/" target="_blank" rel="noopener noreferrer">clap documentation website</a>). We chose to define our arguments using a struct tagged by the <code>#[derive(Clap)]</code> attribute. Attributes in Rust are essentially procedural macros and this one generates code based on the fields defined in the struct.</p>
-<pre style="background-color:#fdf6e3;">
-<span style="color:#268bd2;">struct </span><span style="color:#b58900;">Args </span><span style="color:#657b83;">{
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Project Directory
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">project_directory</span><span style="color:#657b83;">: std::path::PathBuf,
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Output file
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">output_file</span><span style="color:#657b83;">: std::path::PathBuf,
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Changeset before making changes
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">before_changeset</span><span style="color:#657b83;">: String,
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Changeset after changes have been made
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">after_changeset</span><span style="color:#657b83;">: String,
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Unity build flag
-</span><span style="color:#657b83;">	#[clap(short, long)]
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">unity</span><span style="color:#657b83;">: </span><span style="color:#268bd2;">bool</span><span style="color:#657b83;">,
-</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Verbose flag
-</span><span style="color:#657b83;">	#[clap(short, long)]
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">verbose</span><span style="color:#657b83;">: </span><span style="color:#268bd2;">bool</span><span style="color:#657b83;">,
-</span><span style="color:#657b83;">}
+<pre style="background-color:#111218;">
+<span style="color:#ff8f40;">struct </span><span style="color:#d3d0c8;">Args {
+</span><span style="color:#d3d0c8;">	</span><span style="font-style:italic;color:#acb6bf8c;">/// Project Directory
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">project_directory</span><span style="color:#d3d0c8;">: std::path::PathBuf,
+</span><span style="color:#d3d0c8;">	</span><span style="font-style:italic;color:#acb6bf8c;">/// Output file
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">output_file</span><span style="color:#d3d0c8;">: std::path::PathBuf,
+</span><span style="color:#d3d0c8;">	</span><span style="font-style:italic;color:#acb6bf8c;">/// Changeset before making changes
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">before_changeset</span><span style="color:#d3d0c8;">: String,
+</span><span style="color:#d3d0c8;">	</span><span style="font-style:italic;color:#acb6bf8c;">/// Changeset after changes have been made
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">after_changeset</span><span style="color:#d3d0c8;">: String,
+</span><span style="color:#d3d0c8;">	</span><span style="font-style:italic;color:#acb6bf8c;">/// Unity build flag
+</span><span style="color:#d3d0c8;">	#[clap(short, long)]
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">unity</span><span style="color:#d3d0c8;">: </span><span style="color:#ff8f40;">bool</span><span style="color:#d3d0c8;">,
+</span><span style="color:#d3d0c8;">	</span><span style="font-style:italic;color:#acb6bf8c;">/// Verbose flag
+</span><span style="color:#d3d0c8;">	#[clap(short, long)]
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">verbose</span><span style="color:#d3d0c8;">: </span><span style="color:#ff8f40;">bool</span><span style="color:#d3d0c8;">,
+</span><span style="color:#d3d0c8;">}
 </span></pre>
 <p>The above is the complete argument struct at the end of the week. It is especially convenient that clap automatically parses a number of types interchangeably. The derive attribute above generates a <em>parse</em> function that collects the arguments passed to the program and returns them in the form of an instance of the struct. It even generates a <code>-help</code> argument output from documentation comments!</p>
 <p>With the parsed arguments in hand, we need to run a number of commands to complete the steps outlined above. This is very simple with Rust due to the extensive standard library, we used <a href="https://doc.rust-lang.org/beta/std/process/struct.Command.html" target="_blank" rel="noopener noreferrer">std::process::Command</a>.</p>
 <p>Here is a look at how we used the API:</p>
-<pre style="background-color:#fdf6e3;">
-<span style="color:#586e75;">pub </span><span style="color:#268bd2;">fn </span><span style="color:#b58900;">diff_directories</span><span style="color:#657b83;">(
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">directory</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">from_dir</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
-</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">to_dir</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
-</span><span style="color:#657b83;">) -&gt; std::io::Result&lt;std::process::Output&gt; {
-</span><span style="color:#657b83;">	std::process::Command::new(</span><span style="color:#839496;">&quot;</span><span style="color:#2aa198;">git</span><span style="color:#839496;">&quot;</span><span style="color:#657b83;">)
-</span><span style="color:#657b83;">		.</span><span style="color:#859900;">current_dir</span><span style="color:#657b83;">(directory)
-</span><span style="color:#657b83;">		.</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(</span><span style="color:#839496;">&quot;</span><span style="color:#2aa198;">diff</span><span style="color:#839496;">&quot;</span><span style="color:#657b83;">)
-</span><span style="color:#657b83;">		.</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(from_dir)
-</span><span style="color:#657b83;">		.</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(to_dir)
-</span><span style="color:#657b83;">		.</span><span style="color:#859900;">output</span><span style="color:#657b83;">()
-</span><span style="color:#657b83;">}
+<pre style="background-color:#111218;">
+<span style="color:#ff8f40;">pub fn </span><span style="color:#ffb454;">diff_directories</span><span style="color:#d3d0c8;">(
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">directory</span><span style="color:#d3d0c8;">: &amp;std::path::Path,
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">from_dir</span><span style="color:#d3d0c8;">: &amp;std::path::Path,
+</span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">to_dir</span><span style="color:#d3d0c8;">: &amp;std::path::Path,
+</span><span style="color:#d3d0c8;">) -&gt; std::io::Result&lt;std::process::Output&gt; {
+</span><span style="color:#d3d0c8;">	std::process::Command::new(&quot;</span><span style="color:#bfbdb6;">git</span><span style="color:#d3d0c8;">&quot;)
+</span><span style="color:#d3d0c8;">		.</span><span style="color:#66cccc;">current_dir</span><span style="color:#d3d0c8;">(directory)
+</span><span style="color:#d3d0c8;">		.</span><span style="color:#66cccc;">arg</span><span style="color:#d3d0c8;">(&quot;</span><span style="color:#bfbdb6;">diff</span><span style="color:#d3d0c8;">&quot;)
+</span><span style="color:#d3d0c8;">		.</span><span style="color:#66cccc;">arg</span><span style="color:#d3d0c8;">(from_dir)
+</span><span style="color:#d3d0c8;">		.</span><span style="color:#66cccc;">arg</span><span style="color:#d3d0c8;">(to_dir)
+</span><span style="color:#d3d0c8;">		.</span><span style="color:#66cccc;">output</span><span style="color:#d3d0c8;">()
+</span><span style="color:#d3d0c8;">}
 </span></pre>
 <p>Using code similar to the above, we were able to run the various commands required to get the basic process in place, these were: git fetch/checkout, running the compiler (a custom build system in this case) and git diff (displayed above). It was helpful that <a href="https://git-scm.com/docs/git-diff" target="_blank" rel="noopener noreferrer">git diff</a> provides a argument set that allows for directory diffing; we didn't like the idea of individually diffing each pair of output assembly files.</p>
 <hr />
@@ -84,9 +84,9 @@
 <p><code>C:\Users\&lt;Username&gt;\AppData\Local\Temp\&lt;SHA-1&gt;\before</code></p>
 <p>Once we had the assembly in the right place, we used the <code>diff_directories</code> function to generate the diff. This is when we noticed a few problems. Firstly, the diff output was very noisy, especially when we tested on the whole Unity codebase. A simple change in one area of the engine would cause a mass of assembly line modifications, most of which we were not interested in. Secondly, assembly is large; a build of the Unity code base generated 5.37 gigabytes of assembly data. These issues combined resulted in a very large output diff consisting largely of superfluous modifications.</p>
 <p>We needed solutions for both of these problems for the tool to be useful at all. Deliberations and analysis of both the assembly and the diff led us to our solution; post process everything. We first post processed the diff since we noticed many lines had changed due to constant offset changes or data segment identifier changes. We went for the quick and naive approach of comparing each line to it's previous and discarding the lines from the diff if they were deemed similar <em>enough.</em></p>
-<pre style="background-color:#fdf6e3;">
-<span style="color:#657b83;">- mov rax, QWORD PTR $T11\[rsp]
-</span><span style="color:#657b83;">+ mov rax, QWORD PTR $T10\[rsp]
+<pre style="background-color:#111218;">
+<span style="color:#d3d0c8;">- mov rax, QWORD PTR $T11\[rsp]
+</span><span style="color:#d3d0c8;">+ mov rax, QWORD PTR $T10\[rsp]
 </span></pre>
 <p>This reduced our diff by a decent amount, but it still wasn't small enough to create a usable output. Post processing the gigabytes of assembly data was the next step. Analysis of the assembly files revealed that there was alot that we could discard; we only wanted to diff instructions, not the surrounding data. We could therefore remove all lines outside of <em>TEXT</em> segments. Further processing / prettifying could be performed on the segments that remained to further reduce the size of the output.</p>
 <p>The following is a non-exhaustive list of the post processes performed:</p>
@@ -114,7 +114,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Thu, 24 Jul 2025 22:25:34 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Fri, 25 Jul 2025 00:14:08 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
