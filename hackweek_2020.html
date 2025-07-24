@@ -42,20 +42,20 @@
 <p>We settled on using <a href="https://github.com/clap-rs/clap" target="_blank" rel="noopener noreferrer">clap</a> as our command line argument parser. It offers a variety of patterns for defining the arguments your tool expects (a complete listing can be found on the <a href="https://docs.rs/clap/2.33.1/clap/" target="_blank" rel="noopener noreferrer">clap documentation website</a>). We chose to define our arguments using a struct tagged by the <code>#[derive(Clap)]</code> attribute. Attributes in Rust are essentially procedural macros and this one generates code based on the fields defined in the struct.</p>
 <pre style="background-color:#fdf6e3;">
 <span style="color:#268bd2;">struct </span><span style="color:#b58900;">Args </span><span style="color:#657b83;">{
-</span><span style="color:#657b83;">    </span><span style="color:#93a1a1;">/// Project Directory
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">project_directory</span><span style="color:#657b83;">: std::path::PathBuf,
-</span><span style="color:#657b83;">    </span><span style="color:#93a1a1;">/// Output file
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">output_file</span><span style="color:#657b83;">: std::path::PathBuf,
-</span><span style="color:#657b83;">    </span><span style="color:#93a1a1;">/// Changeset before making changes
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">before_changeset</span><span style="color:#657b83;">: String,
-</span><span style="color:#657b83;">    </span><span style="color:#93a1a1;">/// Changeset after changes have been made
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">after_changeset</span><span style="color:#657b83;">: String,
-</span><span style="color:#657b83;">    </span><span style="color:#93a1a1;">/// Unity build flag
-</span><span style="color:#657b83;">    #[clap(short, long)]
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">unity</span><span style="color:#657b83;">: </span><span style="color:#268bd2;">bool</span><span style="color:#657b83;">,
-</span><span style="color:#657b83;">    </span><span style="color:#93a1a1;">/// Verbose flag
-</span><span style="color:#657b83;">    #[clap(short, long)]
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">verbose</span><span style="color:#657b83;">: </span><span style="color:#268bd2;">bool</span><span style="color:#657b83;">,
+</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Project Directory
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">project_directory</span><span style="color:#657b83;">: std::path::PathBuf,
+</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Output file
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">output_file</span><span style="color:#657b83;">: std::path::PathBuf,
+</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Changeset before making changes
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">before_changeset</span><span style="color:#657b83;">: String,
+</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Changeset after changes have been made
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">after_changeset</span><span style="color:#657b83;">: String,
+</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Unity build flag
+</span><span style="color:#657b83;">	#[clap(short, long)]
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">unity</span><span style="color:#657b83;">: </span><span style="color:#268bd2;">bool</span><span style="color:#657b83;">,
+</span><span style="color:#657b83;">	</span><span style="color:#93a1a1;">/// Verbose flag
+</span><span style="color:#657b83;">	#[clap(short, long)]
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">verbose</span><span style="color:#657b83;">: </span><span style="color:#268bd2;">bool</span><span style="color:#657b83;">,
 </span><span style="color:#657b83;">}
 </span></pre>
 <p>The above is the complete argument struct at the end of the week. It is especially convenient that clap automatically parses a number of types interchangeably. The derive attribute above generates a <em>parse</em> function that collects the arguments passed to the program and returns them in the form of an instance of the struct. It even generates a <code>-help</code> argument output from documentation comments!</p>
@@ -63,16 +63,16 @@
 <p>Here is a look at how we used the API:</p>
 <pre style="background-color:#fdf6e3;">
 <span style="color:#586e75;">pub </span><span style="color:#268bd2;">fn </span><span style="color:#b58900;">diff_directories</span><span style="color:#657b83;">(
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">directory</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">from_dir</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
-</span><span style="color:#657b83;">    </span><span style="color:#268bd2;">to_dir</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">directory</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">from_dir</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
+</span><span style="color:#657b83;">	</span><span style="color:#268bd2;">to_dir</span><span style="color:#657b83;">: </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">std::path::Path,
 </span><span style="color:#657b83;">) -&gt; std::io::Result&lt;std::process::Output&gt; {
-</span><span style="color:#657b83;">    std::process::Command::new(</span><span style="color:#839496;">&quot;</span><span style="color:#2aa198;">git</span><span style="color:#839496;">&quot;</span><span style="color:#657b83;">)
-</span><span style="color:#657b83;">        .</span><span style="color:#859900;">current_dir</span><span style="color:#657b83;">(directory)
-</span><span style="color:#657b83;">        .</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(</span><span style="color:#839496;">&quot;</span><span style="color:#2aa198;">diff</span><span style="color:#839496;">&quot;</span><span style="color:#657b83;">)
-</span><span style="color:#657b83;">        .</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(from_dir)
-</span><span style="color:#657b83;">        .</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(to_dir)
-</span><span style="color:#657b83;">        .</span><span style="color:#859900;">output</span><span style="color:#657b83;">()
+</span><span style="color:#657b83;">	std::process::Command::new(</span><span style="color:#839496;">&quot;</span><span style="color:#2aa198;">git</span><span style="color:#839496;">&quot;</span><span style="color:#657b83;">)
+</span><span style="color:#657b83;">		.</span><span style="color:#859900;">current_dir</span><span style="color:#657b83;">(directory)
+</span><span style="color:#657b83;">		.</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(</span><span style="color:#839496;">&quot;</span><span style="color:#2aa198;">diff</span><span style="color:#839496;">&quot;</span><span style="color:#657b83;">)
+</span><span style="color:#657b83;">		.</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(from_dir)
+</span><span style="color:#657b83;">		.</span><span style="color:#859900;">arg</span><span style="color:#657b83;">(to_dir)
+</span><span style="color:#657b83;">		.</span><span style="color:#859900;">output</span><span style="color:#657b83;">()
 </span><span style="color:#657b83;">}
 </span></pre>
 <p>Using code similar to the above, we were able to run the various commands required to get the basic process in place, these were: git fetch/checkout, running the compiler (a custom build system in this case) and git diff (displayed above). It was helpful that <a href="https://git-scm.com/docs/git-diff" target="_blank" rel="noopener noreferrer">git diff</a> provides a argument set that allows for directory diffing; we didn't like the idea of individually diffing each pair of output assembly files.</p>
@@ -114,7 +114,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Thu, 24 Jul 2025 22:02:54 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Thu, 24 Jul 2025 22:25:34 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;

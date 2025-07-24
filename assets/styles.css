@@ -1,6 +1,7 @@
 :root {
   --container-padding: 2rem;
   --container-margin-block: 5%;
+  --code-tab-size: 4;
 
   /* Colour Palette */
   --color-bg: #171b24;
@@ -77,6 +78,7 @@ pre {
   margin-left: calc(var(--container-padding) * -1);
   margin-right: calc(var(--container-padding) * -1);
   overflow: auto;
+  tab-size: var(--code-tab-size);
 }
 
 blockquote {
@@ -176,5 +178,6 @@ img {
 @media (max-width: 1000px) {
   :root {
     --container-margin-block: 0%;
+    --code-tab-size: 2;
   }
 }

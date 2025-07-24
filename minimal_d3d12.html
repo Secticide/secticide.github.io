@@ -125,10 +125,10 @@
 </span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Type </span><span style="color:#657b83;">= D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 </span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Flags </span><span style="color:#657b83;">= D3D12_RESOURCE_BARRIER_FLAG_NONE;
 </span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Transition </span><span style="color:#657b83;">= {
-</span><span style="color:#657b83;">    render_targets</span><span style="color:#268bd2;">[</span><span style="color:#657b83;">frame_index</span><span style="color:#268bd2;">]</span><span style="color:#657b83;">.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(),
-</span><span style="color:#657b83;">    D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_PRESENT,
-</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_RENDER_TARGET
+</span><span style="color:#657b83;">	render_targets</span><span style="color:#268bd2;">[</span><span style="color:#657b83;">frame_index</span><span style="color:#268bd2;">]</span><span style="color:#657b83;">.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(),
+</span><span style="color:#657b83;">	D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+</span><span style="color:#657b83;">	D3D12_RESOURCE_STATE_PRESENT,
+</span><span style="color:#657b83;">	D3D12_RESOURCE_STATE_RENDER_TARGET
 </span><span style="color:#657b83;">};
 </span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">ResourceBarrier</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">barrier);
 </span><span style="color:#657b83;">
@@ -143,10 +143,10 @@
 </span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">DrawInstanced</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">3</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">, </span><span style="color:#6c71c4;">0</span><span style="color:#657b83;">);
 </span><span style="color:#657b83;">
 </span><span style="color:#657b83;">barrier.</span><span style="color:#268bd2;">Transition </span><span style="color:#657b83;">= {
-</span><span style="color:#657b83;">    render_targets</span><span style="color:#268bd2;">[</span><span style="color:#657b83;">frame_index</span><span style="color:#268bd2;">]</span><span style="color:#657b83;">.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(),
-</span><span style="color:#657b83;">    D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_RENDER_TARGET,
-</span><span style="color:#657b83;">    D3D12_RESOURCE_STATE_PRESENT
+</span><span style="color:#657b83;">	render_targets</span><span style="color:#268bd2;">[</span><span style="color:#657b83;">frame_index</span><span style="color:#268bd2;">]</span><span style="color:#657b83;">.</span><span style="color:#b58900;">Get</span><span style="color:#657b83;">(),
+</span><span style="color:#657b83;">	D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+</span><span style="color:#657b83;">	D3D12_RESOURCE_STATE_RENDER_TARGET,
+</span><span style="color:#657b83;">	D3D12_RESOURCE_STATE_PRESENT
 </span><span style="color:#657b83;">};
 </span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">ResourceBarrier</span><span style="color:#657b83;">(</span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">, </span><span style="color:#859900;">&amp;</span><span style="color:#657b83;">barrier);
 </span><span style="color:#657b83;">cmd_list-&gt;</span><span style="color:#b58900;">Close</span><span style="color:#657b83;">();
@@ -161,8 +161,8 @@
 </span><span style="color:#657b83;">fence_value += </span><span style="color:#6c71c4;">1</span><span style="color:#657b83;">;
 </span><span style="color:#657b83;">
 </span><span style="color:#859900;">if </span><span style="color:#657b83;">(fence-&gt;</span><span style="color:#b58900;">GetCompletedValue</span><span style="color:#657b83;">() &lt; current_fence_value) {
-</span><span style="color:#657b83;">    fence-&gt;</span><span style="color:#b58900;">SetEventOnCompletion</span><span style="color:#657b83;">(current_fence_value, fence_event);
-</span><span style="color:#657b83;">    </span><span style="color:#b58900;">WaitForSingleObject</span><span style="color:#657b83;">(fence_event, INFINITE);
+</span><span style="color:#657b83;">	fence-&gt;</span><span style="color:#b58900;">SetEventOnCompletion</span><span style="color:#657b83;">(current_fence_value, fence_event);
+</span><span style="color:#657b83;">	</span><span style="color:#b58900;">WaitForSingleObject</span><span style="color:#657b83;">(fence_event, INFINITE);
 </span><span style="color:#657b83;">}
 </span><span style="color:#657b83;">
 </span><span style="color:#657b83;">frame_index = swapchain-&gt;</span><span style="color:#b58900;">GetCurrentBackBufferIndex</span><span style="color:#657b83;">();
@@ -177,7 +177,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Thu, 24 Jul 2025 22:02:54 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Thu, 24 Jul 2025 22:25:34 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
