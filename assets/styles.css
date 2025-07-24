@@ -1,5 +1,6 @@
 :root {
-  --container-padding: 3rem;
+  --container-padding: 2rem;
+  --container-margin-block: 5%;
 
   /* Colour Palette */
   --color-bg: #171b24;
@@ -71,14 +72,10 @@ a:hover {
 }
 
 pre {
-  font-family: monospace;
-  padding: 2rem 3rem;
-  font-size: 1.3rem;
-  line-height: 1.6rem;
+  padding: 3%;
+  line-height: 1.4rem;
   margin-left: calc(var(--container-padding) * -1);
   margin-right: calc(var(--container-padding) * -1);
-  white-space: pre-wrap;
-  word-wrap: break-word;
   overflow: auto;
 }
 
@@ -86,17 +83,15 @@ blockquote {
   font-style: italic;
   text-align: left;
   color: var(--color-highlight);
-  margin: 2rem;
-  padding-left: 2rem;
+  margin: 1rem;
+  padding-left: 1rem;
   border-left: 2px solid var(--color-highlight);
 }
 
 code {
   margin: 0;
-  line-height: 1.5rem;
+  line-height: 1.4rem;
   color: var(--color-code);
-  white-space: pre-wrap;
-  word-wrap: break-word;
   overflow: auto;
 }
 
@@ -117,7 +112,8 @@ img {
 }
 
 .container {
-  margin: 5% auto;
+  margin-block: var(--container-margin-block);
+  margin-inline: auto;
   padding: var(--container-padding);
   max-width: 1000px;
   border: 1px solid var(--color-border);
@@ -175,4 +171,10 @@ img {
 
 .window-icon {
   width: 1rem;
+}
+
+@media (max-width: 1000px) {
+  :root {
+    --container-margin-block: 0%;
+  }
 }
