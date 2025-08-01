@@ -12,8 +12,7 @@
   --color-header: #f0a96b;
   --color-subheader: #ffdfb3;
   --color-link: #f3978b;
-  --color-link-hover-bg: #f3978b;
-  --color-link-hover-fg: #242936;
+  --color-link-hover: #e3e3e3;
 
   --color-code: #8eccec;
   --color-highlight: #cfed95;
@@ -70,8 +69,7 @@ a {
 }
 
 a:hover {
-  background-color: var(--color-link-hover-bg);
-  color: var(--color-link-hover-fg);
+  color: var(--color-link-hover);
 }
 
 pre {

@@ -79,7 +79,7 @@
 </span><span style="color:#bfbdb6;">}</span><span style="color:#d3d0c8;">;
 </span></pre>
 <p>This implementation is <em>technically</em> already complete, assuming there is no misuse (like recursively calling lock or calling release when the lock isn't held). It is also incredibly fast when used in low contention scenarios due to locking and unlocking requiring a single atomic operation.</p>
-<p>The problem is that all threads waiting for the lock will spin-loop until the lock is available - not good. We need a means to sleep the thread while it waits for the lock, and to then reawaken it when the lock is available.</p>
+<p>The issue is that all waiting threads enter a spin-loop until the lock becomes available, leading to wasted CPU cycles and core starvation. We need a way to put the thread to sleep while it waits for the lock and wake it up once the lock becomes available.</p>
 <h2>Atomic Wait &amp; Notify</h2>
 <p>One option would be to use the operating system primitives listed above to sleep the threads; but we can do better! All desktop operating systems also provide a low-cost primitive for sleeping and waking threads:</p>
 <ul>
@@ -159,7 +159,7 @@
         <a href="#top">&#10532; Back To Top</a>
     </span>
     <span class="flavour-text">
-        Gdt Fri, 25 Jul 2025 00:52:17 +0100&nbsp;&nbsp;&nbsp;&nbsp;
+        Gdt Sat, 2 Aug 2025 00:28:28 +0100&nbsp;&nbsp;&nbsp;&nbsp;
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
         UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
         LF&nbsp;&nbsp;&nbsp;&nbsp;
