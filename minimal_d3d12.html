@@ -28,11 +28,11 @@
 <hr />
 <h2>Inspiration</h2>
 <p>A good few years back, I stumbled upon <a href="https://twitter.com/d7samurai" target="_blank" rel="noopener noreferrer">d7samurai</a>'s <a href="https://gist.github.com/d7samurai/261c69490cce0620d0bfc93003cd1052" target="_blank" rel="noopener noreferrer">Minimal D3D11</a> sample and have since used it as a reference point. When starting any graphics-based exploration using D3D11, I reference this example to get started quickly. On top of this, there are further samples that detail how certain graphics effects can be achieved, such as shadow mapping, instanced rendering, and various ways to structure your graphics code.</p>
-<p>When seeking a similar sample project for D3D12 or Vulkan, I have been unable to find something quite as simplistic (although I do have to call out the <a href="https://vulkan-tutorial.com/" target="_blank" rel="noopener noreferrer">Vulkan Tutorial</a> here as a great way to get started using the API). The only source I've found for D3D12 is the Microsoft-written <a href="https://github.com/microsoft/DirectX-Graphics-Samples/tree/master" target="_blank" rel="noopener noreferrer">DirectX Graphics Samples</a>, which are great but are missing the <em>minimal</em> element I'm seeking. I decided to write it myself, both to clarify my own understanding and in case it proves useful to others.</p>
+<p>When seeking a similar sample project for D3D12 or Vulkan, I have been unable to find something quite as minimal (although I do have to call out the <a href="https://vulkan-tutorial.com/" target="_blank" rel="noopener noreferrer">Vulkan Tutorial</a> here as a great way to get started using the API). The only source I've found for D3D12 is the Microsoft-written <a href="https://github.com/microsoft/DirectX-Graphics-Samples/tree/master" target="_blank" rel="noopener noreferrer">DirectX Graphics Samples</a>, which are great but are missing the <em>minimal</em> element I'm seeking. I decided to write it myself, both to clarify my own understanding and in case it proves useful to others.</p>
 <hr />
 <h2>Minimal D3D12</h2>
 <p>Github link: <a href="https://github.com/Secticide/Graphics-Samples/blob/main/cpp/D3D12/Minimal-D3D12/main.cpp" target="_blank" rel="noopener noreferrer">Secticide/Graphics-Samples/cpp/D3D12/Minimal-D3D12/main.cpp</a></p>
-<p>The first part of the journey is a very simple <em>Hello, Triangle</em> example that shows how to open a window using the Win32 API, set up the render pipeline, and push render commands to a command buffer. Considering the verbosity of modern graphics APIs, it is good to see that all of this is possible in just under 350 lines of C++. Let's take a look through the steps required to get a triangle rendering in DirectX 12.</p>
+<p>The first part of the journey is a very simple <em>Hello, Triangle</em> example that shows how to open a window using the Win32 API, set up the render pipeline, and push render commands to a command buffer. Despite the verbosity of modern graphics APIs, all of this is possible in just under 350 lines of C++. Let's take a look through the steps required to get a triangle rendering in DirectX 12.</p>
 <h3>1. Opening A Window</h3>
 <p>The first thing any application needs to do is open a window. Most game-style applications use one of the popular cross-platform libraries like <a href="https://www.libsdl.org/" target="_blank" rel="noopener noreferrer">SDL2</a> (we're almost at <a href="https://wiki.libsdl.org/SDL3/FrontPage" target="_blank" rel="noopener noreferrer">SDL3</a>) or <a href="https://www.glfw.org/" target="_blank" rel="noopener noreferrer">GLFW</a>. While this approach simplifies porting applications to other platforms, this example is intentionally minimal and therefore sticks to Win32 APIs:</p>
 <pre style="background-color:#111218;">
@@ -179,7 +179,7 @@
 
                 <div class="navigation">
     <span class="flavour-text">
-        Gdt Sat, 2 Aug 2025 01:08:48 +0100
+        Gdt Thu, 30 Apr 2026 22:51:38 +0100
     </span>
     <span class="flavour-text">
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;

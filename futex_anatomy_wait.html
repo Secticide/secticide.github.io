@@ -24,15 +24,15 @@
                 <span class="reading-time">7 minute read</span>
            </header>
            <main>
-                <p>Why does the Futex exist? A number of years ago I was pondering this very question - along with why developers looking for a fast, low-latency lock often reach for the primitive. Unfortunately resources on the topic and details of the implementation were relatively scarce. These details can certainly be found, but I'm yet to find a single resource that covers most of what you need to know in a single place. If, like my younger self, you are looking for details on what a Futex is and how it is implemented; you have come to the right place!</p>
+                <p>Why does the Futex exist? A number of years ago I was pondering this very question - along with why developers looking for a fast, low-latency lock often reach for the primitive. Unfortunately resources on the topic and details of the implementation were relatively scarce. These details can certainly be found, but I have yet to find a single resource that covers most of what you need to know in a single place. If, like my younger self, you are looking for details on what a Futex is and how it is implemented; you have come to the right place!</p>
 <hr />
 <h2>What is a Futex?</h2>
 <p>Let us begin by quoting a snippet from the <a href="https://en.wikipedia.org/wiki/Futex" target="_blank" rel="noopener noreferrer">Futex Wikipedia page</a>:</p>
 <blockquote>
 <p>In computing, a futex (short for &quot;fast userspace mutex&quot;) is a kernel system call that programmers can use to implement basic locking, or as a building block for higher-level locking abstractions such as semaphores and POSIX mutexes or condition variables.</p>
 </blockquote>
-<p>While this snippet is somewhat misleading, it does give us a step in the right direction. Futex is short for <em>&quot;fast userspace mutex&quot;</em>, it <em>is</em> a Mutex that is <em>fast</em> and in <em>userspace</em>. We all know what is meant by the term fast, but what does userspace mean in this context?</p>
-<p>Userspace is referring to any code that is <em>not</em> executed within the operating system kernel. There is a cost to transitioning our execution context into and out of the kernel (along with not knowing when the execution context will be returned), generally leading to increased latency. The goal then, is to remain in userspace as much as possible - this is what makes a Futex <em>fast</em>.</p>
+<p>While this snippet is somewhat misleading, it does give us a step in the right direction. Futex is short for <em>&quot;fast userspace mutex&quot;</em>. It is a Mutex that is fast and is implemented entirely in userspace. We all know what is meant by the term fast, but what does userspace mean in this context?</p>
+<p>Userspace refers to any code that is <em>not</em> executed within the operating system kernel. There is a cost to transitioning our execution context into and out of the kernel (along with not knowing when the execution context will be returned), generally leading to increased latency. The goal then, is to remain in userspace as much as possible - this is what makes a Futex <em>fast</em>.</p>
 <h2>Mutex Breakdown</h2>
 <p>Now that we know what a Futex is, let's take a look at how we can split a Mutex into its constituent parts to review how it could be optimised for low-latency. All modern desktop operating systems provide a range of kernel level synchronisation primitives, including a Mutex:</p>
 <ul>
@@ -87,7 +87,7 @@
 <li>Linux: <a href="https://linux.die.net/man/7/futex" target="_blank" rel="noopener noreferrer">futex</a></li>
 <li>Mac: <a href="https://developer.apple.com/documentation/os/os_sync_wait_on_address" target="_blank" rel="noopener noreferrer">os_sync_wait_on_address</a> &amp; <a href="https://developer.apple.com/documentation/os/os_sync_wake_by_address_any" target="_blank" rel="noopener noreferrer">os_sync_wake_by_address</a></li>
 </ul>
-<p>The title of this section is &quot;Atomic Wait &amp; Notify&quot; because in C++20 (released in 2020), these low cost sleep / wake primitives were added to the standard as building blocks intended for use with primitives like the Futex. The APIs being referenced can be found on <em>cppreference</em>:</p>
+<p>The title of this section is &quot;Atomic Wait &amp; Notify&quot; because in C++20 (released in 2020), these low cost sleep / wake primitives were added to the standard as building blocks intended for use with primitives like the Futex. The relevant APIs can be found on <em>cppreference</em>:</p>
 <ul>
 <li><em>Wait on address</em> maps to <a href="https://en.cppreference.com/w/cpp/atomic/atomic_wait.html" target="_blank" rel="noopener noreferrer">std::atomic_wait</a></li>
 <li><em>Wake by address</em> maps to <a href="https://en.cppreference.com/w/cpp/atomic/atomic_notify_one.html" target="_blank" rel="noopener noreferrer">std::atomic_notify</a></li>
@@ -147,16 +147,16 @@
 <li>The atomic wait and notify have been added using the <code>std::atomic&lt;T&gt;</code> wrappers</li>
 <li>An explicit <em>fast path</em> and <em>slow path</em> have been added to the <code>lock</code> method</li>
 </ul>
-<p>The first thread to acquire the lock will succeed at the compare exchange strong (fast path) and early exit; in low contention scenarios acquiring the lock will be incredibly fast. If there is contention however, a single thread will succeed quickly while the others will fall into the while loop (slow path). These other threads will use atomic wait to await changes to the <code>_status</code> field.</p>
+<p>The first thread to acquire the lock will succeed at the compare exchange strong (fast path) and exit early. In low contention scenarios, acquiring the lock will be incredibly fast. If there is contention however, a single thread will succeed quickly while the others will fall into the while loop (slow path). These other threads will use atomic wait to await changes to the <code>_status</code> field.</p>
 <p>Once the first thread has completed its critical section, it will call <code>unlock</code> which will atomically <code>exchange</code> the state. <code>exchange</code> returns the previous value of the atomic, this is checked for if it is <em>contended</em> and if so atomic <code>notify</code> will be called to wake up a single waiting thread. The idea here is that if the state is <em>locked</em>, there are no threads waiting and therefore the notify call is not required - significantly reducing the cost of locking and unlocking if there is no contention.</p>
 <p>As a final note; we <em>must</em> assume that threads waiting could wake up without unlock being called, this is known as a &quot;spurious wake up&quot;. We have protected against this by trapping execution in a loop and restricting the exit conditions carefully.</p>
 <h2>What's Next</h2>
-<p>Let's be clear, this is not a production ready implementation, many areas could be improved. Protection against recursive locking and multiple unlocking, as well as performance optimisations such as a limited low-power spin looping which would attempt to <em>catch</em> cases where the lock is held momentarily.</p>
-<p>The Rust standard library implementation is open source and easy to read and understand, if you would like to review something production ready: <a href="https://doc.rust-lang.org/nightly/src/std/sys/sync/mutex/futex.rs.html" target="_blank" rel="noopener noreferrer">futex.rs</a></p>
+<p>Let's be clear: this is not a production-ready implementation and many areas could be improved, including protection against recursive locking and multiple unlocking, as well as performance optimisations such as a limited low-power spin loop to catch cases when locks are held for a short duration.</p>
+<p>For a production-ready reference, the Rust standard library implementation is well worth a read: <a href="https://doc.rust-lang.org/nightly/src/std/sys/sync/mutex/futex.rs.html" target="_blank" rel="noopener noreferrer">futex.rs</a></p>
 
                 <div class="navigation">
     <span class="flavour-text">
-        Gdt Sat, 2 Aug 2025 01:08:48 +0100
+        Gdt Thu, 30 Apr 2026 22:51:38 +0100
     </span>
     <span class="flavour-text">
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;

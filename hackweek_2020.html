@@ -63,7 +63,7 @@
 </span><span style="color:#d3d0c8;">	</span><span style="color:#39bae6;">verbose</span><span style="color:#d3d0c8;">: </span><span style="color:#ff8f40;">bool</span><span style="color:#d3d0c8;">,
 </span><span style="color:#d3d0c8;">}
 </span></pre>
-<p>The above is the complete argument struct at the end of the week. It is especially convenient that clap automatically parses a number of types interchangeably. The derive attribute above generates a <em>parse</em> function that collects the arguments passed to the program and returns them in the form of an instance of the struct. It even generates a <code>-help</code> argument output from documentation comments!</p>
+<p>The above is the complete argument struct at the end of the week. Notably, clap automatically parses multiple types interchangeably. The derive attribute above generates a <em>parse</em> function that collects the arguments passed to the program and returns them in the form of an instance of the struct. It even generates a <code>-help</code> argument output from documentation comments!</p>
 <p>With the parsed arguments in hand, we need to run a number of commands to complete the steps outlined above. This is very simple with Rust due to the extensive standard library, we used <a href="https://doc.rust-lang.org/beta/std/process/struct.Command.html" target="_blank" rel="noopener noreferrer">std::process::Command</a>.</p>
 <p>Here is a look at how we used the API:</p>
 <pre style="background-color:#111218;">
@@ -88,12 +88,12 @@
 <p>Where a complete path (on Windows) could look like this:</p>
 <p><code>C:\Users\&lt;Username&gt;\AppData\Local\Temp\&lt;SHA-1&gt;\before</code></p>
 <p>Once we had the assembly in the right place, we used the <code>diff_directories</code> function to generate the diff. This is when we noticed a few problems. Firstly, the diff output was very noisy, especially when we tested on the whole Unity codebase. A simple change in one area of the engine would cause a mass of assembly line modifications, most of which we were not interested in. Secondly, assembly is large; a build of the Unity code base generated 5.37 gigabytes of assembly data. These issues combined resulted in a very large output diff consisting largely of superfluous modifications.</p>
-<p>We needed solutions for both of these problems for the tool to be useful at all. Deliberations and analysis of both the assembly and the diff led us to our solution; post process everything. We first post processed the diff since we noticed many lines had changed due to constant offset changes or data segment identifier changes. We went for the quick and naive approach of comparing each line to it's previous and discarding the lines from the diff if they were deemed similar <em>enough.</em></p>
+<p>We needed solutions to both of these problems if the tool were to be useful. Deliberations and analysis of both the assembly and the diff led us to our solution; post process everything. We first post processed the diff since we noticed many lines had changed due to constant offset changes or data segment identifier changes. We went for the quick and naive approach of comparing each line to its previous and discarding the lines from the diff if they were deemed similar <em>enough.</em></p>
 <pre style="background-color:#111218;">
 <span style="color:#d3d0c8;">- mov rax, QWORD PTR $T11\[rsp]
 </span><span style="color:#d3d0c8;">+ mov rax, QWORD PTR $T10\[rsp]
 </span></pre>
-<p>This reduced our diff by a decent amount, but it still wasn't small enough to create a usable output. Post processing the gigabytes of assembly data was the next step. Analysis of the assembly files revealed that there was alot that we could discard; we only wanted to diff instructions, not the surrounding data. We could therefore remove all lines outside of <em>TEXT</em> segments. Further processing / prettifying could be performed on the segments that remained to further reduce the size of the output.</p>
+<p>This reduced our diff by a decent amount, but it still wasn't small enough to create a usable output. Post processing the gigabytes of assembly data was the next step. Analysis of the assembly files revealed that there was a lot that we could discard; we only wanted to diff instructions, not the surrounding data. We could therefore remove all lines outside of <em>TEXT</em> segments. Further processing / prettifying could be performed on the segments that remained to further reduce the size of the output.</p>
 <p>The following is a non-exhaustive list of the post processes performed:</p>
 <ul>
 <li>Discard empty lines,</li>
@@ -102,7 +102,7 @@
 <li>Discard all blocks that are not <em>TEXT</em> blocks,</li>
 <li>Prettify function names.</li>
 </ul>
-<p>This looks like very aggressive post-processing and eager discarding of contents, I imagine in the future this would be configurable; there are cases where keeping various sections of the assembly files would be desirable dependent on use case and result desired. However, this worked for us and reduced the size of the assembly data generated from the previously mentioned 5.37 down to 1.4 gigabytes - I call that a success!</p>
+<p>At first glance this may appear to be aggressive post-processing and overly eager in discarding content, but if the tool were to be developed further, these rules or passes would be configurable. There are clear cases where keeping certain assembly file sections would be desirable, it entirely depends on the goal. However, this worked for us and reduced the assembly data generated from the previously mentioned 5.37 down to 1.4 gigabytes - I call that a success!</p>
 <hr />
 <h2>Presentation</h2>
 <p>Our tool was now able to checkout two provided changesets, execute build scripts to generate assembly files and build a diff from the changes between the two sets of assembly files. The final step was to present the diff in a readable way. Ideally it would also be quickly searchable and provide a collection of other means to inspect the contained information, but we wanted a solution that we could build within a week.</p>
@@ -110,13 +110,13 @@
 <p>There were additional hurdles along the road however, it seems that diff2html (or browsers) can't handle large amounts of diff data, we tried feeding it with 186 megabytes of string data and it wasn't exactly happy with it. We would definitely need a more scalable solution if we were to develop this tool further and use it in a production environment.</p>
 <hr />
 <h2>Future</h2>
-<p>Now that Hackweek has concluded, many teams hope to continue working on their projects. In the past this has led to innovations in either the product or our workflows at Unity. Myself and the team are hoping to continue work on this (where we can find the time) and see what it can grow into, maybe I'll write an update here in the future detailing it's evolution or demise!</p>
+<p>Now that Hackweek has concluded, many teams hope to continue working on their projects. In the past this has led to innovations in either the product or our workflows at Unity. Myself and the team are hoping to continue work on this (where we can find the time) and see what it can grow into, maybe I'll write an update here in the future detailing its evolution or demise!</p>
 <p>Overall, Hackweek this year was a great experience and I thoroughly enjoyed it!</p>
 <p>Take a look at a snippet from one of the HTML files generated by the tool: <a href="assets/hackweek_2020_output_blog.html">Editor_Src_1.html</a></p>
 
                 <div class="navigation">
     <span class="flavour-text">
-        Gdt Sat, 2 Aug 2025 01:08:48 +0100
+        Gdt Thu, 30 Apr 2026 22:51:38 +0100
     </span>
     <span class="flavour-text">
         Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
