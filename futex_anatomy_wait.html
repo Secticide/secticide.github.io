@@ -12,18 +12,16 @@
         <link rel="icon" type="image/x-icon" href="assets/pull-request.svg"/>
         <link rel="stylesheet" href="assets/styles.css">
     </head>
-    <body class="terminal">
-        <div class="container">
-            <div class="title-bar">
-                <span class="flavour-text">jakboulton.net</span>
-                <span><a href="/" class="window-icon" style="text-decoration: none;">✖</a></span>
-            </div>
+    <body>
+        <div class="wrap">
             <header>
                 <h1>Anatomy of the Futex: Wait & Notify</h1>
-                <time datetime="2025-07-19" class="date">19th July 2025</time>
-                <span class="reading-time">7 minute read</span>
-           </header>
-           <main>
+                <p class="article-meta">
+                    <time datetime="2025-07-19">19th July 2025</time>
+                    · 7 minute read
+                </p>
+            </header>
+            <main>
                 <p>Why does the Futex exist? A number of years ago I was pondering this very question - along with why developers looking for a fast, low-latency lock often reach for the primitive. Unfortunately resources on the topic and details of the implementation were relatively scarce. These details can certainly be found, but I have yet to find a single resource that covers most of what you need to know in a single place. If, like my younger self, you are looking for details on what a Futex is and how it is implemented; you have come to the right place!</p>
 <hr />
 <h2>What is a Futex?</h2>
@@ -154,18 +152,12 @@
 <p>Let's be clear: this is not a production-ready implementation and many areas could be improved, including protection against recursive locking and multiple unlocking, as well as performance optimisations such as a limited low-power spin loop to catch cases when locks are held for a short duration.</p>
 <p>For a production-ready reference, the Rust standard library implementation is well worth a read: <a href="https://doc.rust-lang.org/nightly/src/std/sys/sync/mutex/futex.rs.html" target="_blank" rel="noopener noreferrer">futex.rs</a></p>
 
-                <div class="navigation">
-    <span class="flavour-text">
-        Gdt Thu, 30 Apr 2026 23:01:09 +0100
-    </span>
-    <span class="flavour-text">
-        Spaces: 4&nbsp;&nbsp;&nbsp;&nbsp;
-        UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
-        LF&nbsp;&nbsp;&nbsp;&nbsp;
-        HTML&nbsp;&nbsp;&nbsp;&nbsp;&#10064;
-    </span>
-</div>
-           </main>
-       </div>
+            </main>
+            <footer>
+    <span><a href="/">jakboulton.net</a></span>
+    <span>generated Mon, 29 Jun 2026 22:22:29 +0100</span>
+</footer>
+
+        </div>
     </body>
 </html>
