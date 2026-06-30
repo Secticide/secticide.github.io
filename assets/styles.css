@@ -13,6 +13,11 @@
   scrollbar-color: var(--muted) transparent;
 }
 
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   padding: 3.5rem 1.5rem;
@@ -21,7 +26,6 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 1.2rem;
   line-height: 1.8;
-  overflow-x: clip;
 }
 
 .wrap {
@@ -93,13 +97,14 @@ header h3 {
 
 pre {
   background: var(--code-bg);
+  box-sizing: border-box;
   width: 100vw;
   margin-inline: calc(50% - 50vw);
   padding: 1.25rem max(1.5rem, calc(50vw - 430px));
   margin-block: 1.5rem;
   overflow-x: auto;
   line-height: 1.55;
-  tab-size: 4;
+  tab-size: var(--code-tab-size, 4);
 }
 
 code {
@@ -212,5 +217,9 @@ footer {
 @media (max-width: 860px) {
   body {
     padding: 2rem 1rem;
+  }
+
+  :root {
+    --code-tab-size: 2;
   }
 }
