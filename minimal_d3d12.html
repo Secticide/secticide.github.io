@@ -31,7 +31,7 @@
 <h2>Minimal D3D12</h2>
 <p>Github link: <a href="https://github.com/Secticide/Graphics-Samples/blob/main/cpp/D3D12/Minimal-D3D12/main.cpp" target="_blank" rel="noopener noreferrer">Secticide/Graphics-Samples/cpp/D3D12/Minimal-D3D12/main.cpp</a></p>
 <p>The first part of the journey is a very simple <em>Hello, Triangle</em> example that shows how to open a window using the Win32 API, set up the render pipeline, and push render commands to a command buffer. Despite the verbosity of modern graphics APIs, all of this is possible in just under 350 lines of C++. Let's take a look through the steps required to get a triangle rendering in DirectX 12.</p>
-<h3>1. Opening A Window</h3>
+<h3>1. Opening a window</h3>
 <p>The first thing any application needs to do is open a window. Most game-style applications use one of the popular cross-platform libraries like <a href="https://www.libsdl.org/" target="_blank" rel="noopener noreferrer">SDL2</a> (we're almost at <a href="https://wiki.libsdl.org/SDL3/FrontPage" target="_blank" rel="noopener noreferrer">SDL3</a>) or <a href="https://www.glfw.org/" target="_blank" rel="noopener noreferrer">GLFW</a>. While this approach simplifies porting applications to other platforms, this example is intentionally minimal and therefore sticks to Win32 APIs:</p>
 <pre style="background-color:#111218;">
 <span style="color:#d3d0c8;">WNDCLASSW wnd_class{ </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, DefWindowProcW, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, TITLE };
@@ -41,7 +41,7 @@
 </span><span style="color:#d3d0c8;">HWND hwnd{ </span><span style="color:#39bae6;">CreateWindowExW</span><span style="color:#d3d0c8;">(</span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, TITLE, TITLE, WS_POPUP | WS_MAXIMIZE | WS_VISIBLE, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">0</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">nullptr</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">nullptr</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">nullptr</span><span style="color:#d3d0c8;">, </span><span style="color:#f99157;">nullptr</span><span style="color:#d3d0c8;">) };
 </span></pre>
 <p>This is about as simple as you can make it (we don't even check if the Window was created successfully).</p>
-<h3>2. Setting Up</h3>
+<h3>2. Setting up</h3>
 <p>With the window set up, we take our first step into the D3D12 APIs by setting up the <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12sdklayers/nn-d3d12sdklayers-id3d12debug" target="_blank" rel="noopener noreferrer">ID3D12Debug</a> object and enabling it. This helps us understand if we've incorrectly used an API. Most of the time when getting started with graphics programming, if an error is made in the setup of objects or an API function has been used incorrectly, the window will just display black. Enabling the debug layer gives us at least a <em>chance</em> at gaining some more information.</p>
 <pre style="background-color:#111218;">
 <span style="color:#d3d0c8;">ComPtr&lt;ID3D12Debug&gt; debug_controller{};
@@ -99,7 +99,7 @@
 </li>
 </ul>
 <p>With all of these objects set up, we have essentially completed the setup of the graphics pipeline or <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12pipelinestate" target="_blank" rel="noopener noreferrer">ID3D12PipelineState</a>. We are now ready to move forward to setting up our data for rendering. Much like D3D11, we start by creating and filling buffers - in this case, a very simple buffer for the vertex data. Some additional key points to mention are the creation of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12graphicscommandlist" target="_blank" rel="noopener noreferrer">ID3D12GraphicsCommandList</a> for storing our render commands and a <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12fence" target="_blank" rel="noopener noreferrer">ID3D12Fence</a> for synchronisation between the CPU and GPU.</p>
-<h3>3. The Render Loop</h3>
+<h3>3. The render loop</h3>
 <p>The render loop consists of the following steps:</p>
 <ul>
 <li>Resetting the command allocator</li>
@@ -172,13 +172,13 @@
 </span></pre>
 <p>There we have it, about the simplest D3D12 program that you can write!</p>
 <hr />
-<h2>What's Next</h2>
+<h2>What's next</h2>
 <p>You may notice a few future plans subtly implied by the repository setup. Firstly, it is titled <em>Graphics Samples</em>, which of course hints at plans to expand the repository beyond the <em>Hello, Triangle</em> sample. I intend to follow a similar journey to <a href="https://twitter.com/d7samurai" target="_blank" rel="noopener noreferrer">d7samurai</a>'s samples by showcasing other samples for various graphics techniques. The folder structure also suggests plans to port the samples to Vulkan, and even other languages like Rust and Zig, let's see how far we can get!</p>
 
             </main>
             <footer>
     <span><a href="/">jakboulton.net</a></span>
-    <span>generated Sun, 12 Jul 2026 17:32:53 +0100</span>
+    <span>generated Sun, 12 Jul 2026 17:55:24 +0100</span>
 </footer>
 
         </div>

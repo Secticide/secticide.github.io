@@ -24,7 +24,7 @@
             <main>
                 <p>The annual Hackweek event was held last week at Unity. This is an employee only event organised by Unity as a source of innovation, collaboration and idea generation. In the months leading up to the event, employees are encouraged to share their ideas and invite others to join them in a week of research and development. Throughout the week we hack prototypes together and evaluate their potential for future innovation.</p>
 <hr />
-<h2>The Project</h2>
+<h2>The project</h2>
 <p>This year the idea formed during a series of conversations between a number of members of the Sustained Engineering team who are focused on ensuring the quality and stability of Unity. We found a gap in our workflow and wanted a tool that could assist in the pull request review process. The tool would need to help us evaluate the effect a given pull request would have on the performance of the areas of code it touched. It would also have to be small enough in scope to be prototyped within a week. The tool and project we decided to embark on prototyping was an <strong>Assembly Diff Tool</strong>.</p>
 <blockquote>
 <p>Does this pull request improve performance, or hinder it?</p>
@@ -80,7 +80,7 @@
 </span></pre>
 <p>Using code similar to the above, we were able to run the various commands required to get the basic process in place, these were: git fetch/checkout, running the compiler (a custom build system in this case) and git diff (displayed above). It was helpful that <a href="https://git-scm.com/docs/git-diff" target="_blank" rel="noopener noreferrer">git diff</a> provides a argument set that allows for directory diffing; we didn't like the idea of individually diffing each pair of output assembly files.</p>
 <hr />
-<h2>Processing Assembly</h2>
+<h2>Processing assembly</h2>
 <p>We decided to use the temporary directory (<code>std::env::temp_dir()</code>) path and the original changeset hash to create an output directory for the compiled assembly files from each of the builds. Our structure was as follows:</p>
 <p><code>&lt;temp_dir&gt;\&lt;original_sha_1&gt;\&lt;before_or_after&gt;\&lt;asm_files&gt;</code></p>
 <p>Where a complete path (on Windows) could look like this:</p>
@@ -115,7 +115,7 @@
             </main>
             <footer>
     <span><a href="/">jakboulton.net</a></span>
-    <span>generated Sun, 12 Jul 2026 17:32:53 +0100</span>
+    <span>generated Sun, 12 Jul 2026 17:55:24 +0100</span>
 </footer>
 
         </div>

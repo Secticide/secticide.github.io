@@ -31,7 +31,7 @@
 </blockquote>
 <p>While this snippet is somewhat misleading, it does give us a step in the right direction. Futex is short for <em>&quot;fast userspace mutex&quot;</em>. It is a Mutex that is fast and is implemented entirely in userspace. We all know what is meant by the term fast, but what does userspace mean in this context?</p>
 <p>Userspace refers to any code that is <em>not</em> executed within the operating system kernel. There is a cost to transitioning our execution context into and out of the kernel (along with not knowing when the execution context will be returned), generally leading to increased latency. The goal then, is to remain in userspace as much as possible - this is what makes a Futex <em>fast</em>.</p>
-<h2>Mutex Breakdown</h2>
+<h2>Mutex breakdown</h2>
 <p>Now that we know what a Futex is, let's take a look at how we can split a Mutex into its constituent parts to review how it could be optimised for low-latency. All modern desktop operating systems provide a range of kernel level synchronisation primitives, including a Mutex:</p>
 <ul>
 <li>Windows; <a href="https://learn.microsoft.com/en-us/windows/win32/sync/using-mutex-objects" target="_blank" rel="noopener noreferrer">Using Mutex Objects</a></li>
@@ -78,14 +78,14 @@
 </span></pre>
 <p>This implementation is <em>technically</em> already complete, assuming there is no misuse (like recursively calling lock or calling release when the lock isn't held). It is also incredibly fast when used in low contention scenarios due to locking and unlocking requiring a single atomic operation.</p>
 <p>The issue is that all waiting threads enter a spin-loop until the lock becomes available, leading to wasted CPU cycles and core starvation. We need a way to put the thread to sleep while it waits for the lock and wake it up once the lock becomes available.</p>
-<h2>Atomic Wait &amp; Notify</h2>
+<h2>Atomic wait &amp; notify</h2>
 <p>One option would be to use the operating system primitives listed above to sleep the threads; but we can do better! All desktop operating systems also provide a low-cost primitive for sleeping and waking threads:</p>
 <ul>
 <li>Windows: <a href="https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitonaddress" target="_blank" rel="noopener noreferrer">WaitOnAddress</a> &amp; <a href="https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-wakebyaddresssingle" target="_blank" rel="noopener noreferrer">WakeByAddress</a></li>
 <li>Linux: <a href="https://linux.die.net/man/7/futex" target="_blank" rel="noopener noreferrer">futex</a></li>
 <li>Mac: <a href="https://developer.apple.com/documentation/os/os_sync_wait_on_address" target="_blank" rel="noopener noreferrer">os_sync_wait_on_address</a> &amp; <a href="https://developer.apple.com/documentation/os/os_sync_wake_by_address_any" target="_blank" rel="noopener noreferrer">os_sync_wake_by_address</a></li>
 </ul>
-<p>The title of this section is &quot;Atomic Wait &amp; Notify&quot; because in C++20 (released in 2020), these low cost sleep / wake primitives were added to the standard as building blocks intended for use with primitives like the Futex. The relevant APIs can be found on <em>cppreference</em>:</p>
+<p>The title of this section is &quot;Atomic wait &amp; notify&quot; because in C++20 (released in 2020), these low cost sleep / wake primitives were added to the standard as building blocks intended for use with primitives like the Futex. The relevant APIs can be found on <em>cppreference</em>:</p>
 <ul>
 <li><em>Wait on address</em> maps to <a href="https://en.cppreference.com/w/cpp/atomic/atomic_wait.html" target="_blank" rel="noopener noreferrer">std::atomic_wait</a></li>
 <li><em>Wake by address</em> maps to <a href="https://en.cppreference.com/w/cpp/atomic/atomic_notify_one.html" target="_blank" rel="noopener noreferrer">std::atomic_notify</a></li>
@@ -148,14 +148,14 @@
 <p>The first thread to acquire the lock will succeed at the compare exchange strong (fast path) and exit early. In low contention scenarios, acquiring the lock will be incredibly fast. If there is contention however, a single thread will succeed quickly while the others will fall into the while loop (slow path). These other threads will use atomic wait to await changes to the <code>_status</code> field.</p>
 <p>Once the first thread has completed its critical section, it will call <code>unlock</code> which will atomically <code>exchange</code> the state. <code>exchange</code> returns the previous value of the atomic, this is checked for if it is <em>contended</em> and if so atomic <code>notify</code> will be called to wake up a single waiting thread. The idea here is that if the state is <em>locked</em>, there are no threads waiting and therefore the notify call is not required - significantly reducing the cost of locking and unlocking if there is no contention.</p>
 <p>As a final note; we <em>must</em> assume that threads waiting could wake up without unlock being called, this is known as a &quot;spurious wake up&quot;. We have protected against this by trapping execution in a loop and restricting the exit conditions carefully.</p>
-<h2>What's Next</h2>
+<h2>What's next</h2>
 <p>Let's be clear: this is not a production-ready implementation and many areas could be improved, including protection against recursive locking and multiple unlocking, as well as performance optimisations such as a limited low-power spin loop to catch cases when locks are held for a short duration.</p>
 <p>For a production-ready reference, the Rust standard library implementation is well worth a read: <a href="https://doc.rust-lang.org/nightly/src/std/sys/sync/mutex/futex.rs.html" target="_blank" rel="noopener noreferrer">futex.rs</a></p>
 
             </main>
             <footer>
     <span><a href="/">jakboulton.net</a></span>
-    <span>generated Sun, 12 Jul 2026 17:32:53 +0100</span>
+    <span>generated Sun, 12 Jul 2026 17:55:24 +0100</span>
 </footer>
 
         </div>
