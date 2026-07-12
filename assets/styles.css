@@ -98,6 +98,8 @@ header h3 {
 pre {
   background: var(--code-bg);
   box-sizing: border-box;
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  font-size: 0.8rem;
   width: 100vw;
   margin-inline: calc(50% - 50vw);
   padding-block: 1.25rem;
